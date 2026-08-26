@@ -1,0 +1,21 @@
+[project]
+name = "dsh-realsee-python"
+version = "0.1.0"
+description = "Python processing backend for dsh Realsee VR agent"
+requires-python = ">=3.10"
+dependencies = [
+  "Pillow>=10.0.0",
+  "numpy>=1.24.0",
+  "opencv-python>=4.8.0",
+  "requests>=2.31.0",
+  "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+gpu = [
+  "torch>=2.0.0",
+  "bria-rmbg>=2.0.0",
+]
+
+[tool.setuptools]
+py-modules = ["realsee_adapter", "image_pipeline", "video_pipeline"]

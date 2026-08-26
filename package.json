@@ -1,0 +1,47 @@
+{
+  "name": "@kreator666/dsh-realsee-agent",
+  "version": "0.1.0",
+  "description": "DeepSeek Harness plugin for generating group photos and videos in Realsee VR scenes",
+  "type": "module",
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "packageManager": "pnpm@11.7.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "tsx src/index.ts",
+    "demo:photo": "tsx examples/group-photo.demo.ts",
+    "demo:python": "python python/image_pipeline.py --help",
+    "web": "tsx web/server.ts",
+    "ads:dev": "tsx ads-platform/server.ts",
+    "ads:db:reset": "tsx ads-platform/scripts/reset-db.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/dsh-session": "0.1.0-rc.8",
+    "@deepseek-ai/dsh-tools": "0.1.0-rc.8",
+    "better-sqlite3": "^13.0.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "formidable": "^3.5.4"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/express": "^5.0.0",
+    "@types/formidable": "^3.5.1",
+    "@types/node": "^22.5.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh": "^0.1.0-rc.8"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/dsh": {
+      "optional": true
+    }
+  }
+}

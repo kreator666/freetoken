@@ -1,0 +1,10 @@
+# Example Cordis patch to load this plugin in a dsh profile.
+# Copy this content into your dsh profile's cordis.patch.yml,
+# or add the plugin to dsh.profile.bundles.
+
+- id: realsee-agent
+  name: '@kreator666/dsh-realsee-agent'
+  config:
+    # Optional overrides; by default read from .env
+    deepseekApiKey: !!js process.env.DEEPSEEK_API_KEY
+    realseeApiKey: !!js process.env.REALSEE_API_KEY

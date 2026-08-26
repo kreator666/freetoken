@@ -1,0 +1,18 @@
+{
+  "enabled": true,
+  "serverUrl": "http://127.0.0.1:3099",
+  "thresholds": {
+    "aiping.cn": 10,
+    "api.z.ai": 5,
+    "open.bigmodel.cn": 5
+  },
+  "usageThresholds": {
+    "api.qnaigc.com": 1000
+  },
+  "providerNames": {
+    "aiping.cn": "AIPing",
+    "api.qnaigc.com": "七牛",
+    "api.z.ai": "Z.ai",
+    "open.bigmodel.cn": "BigModel"
+  }
+}

@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: dsh-realsee-python
+Version: 0.1.0
+Summary: Python processing backend for dsh Realsee VR agent
+Requires-Python: >=3.10
+Requires-Dist: Pillow>=10.0.0
+Requires-Dist: numpy>=1.24.0
+Requires-Dist: opencv-python>=4.8.0
+Requires-Dist: requests>=2.31.0
+Requires-Dist: python-dotenv>=1.0.0
+Provides-Extra: gpu
+Requires-Dist: torch>=2.0.0; extra == "gpu"
+Requires-Dist: bria-rmbg>=2.0.0; extra == "gpu"
