@@ -1,9 +1,0 @@
-image_pipeline.py
-pyproject.toml
-realsee_adapter.py
-video_pipeline.py
-dsh_realsee_python.egg-info/PKG-INFO
-dsh_realsee_python.egg-info/SOURCES.txt
-dsh_realsee_python.egg-info/dependency_links.txt
-dsh_realsee_python.egg-info/requires.txt
-dsh_realsee_python.egg-info/top_level.txt

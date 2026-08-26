@@ -1,3 +1,0 @@
-image_pipeline
-realsee_adapter
-video_pipeline
