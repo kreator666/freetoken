@@ -3,19 +3,7 @@ dist/
 .env
 *.log
 .DS_Store
-__pycache__/
-*.pyc
-*.pyo
-python/.venv/
-python/*.egg-info/
-assets/output/
-assets/temp/
 
 # ads-platform runtime data
 ads-platform/data/
 ads-platform/hooks/zcode/check-balance.marker.log
-
-# web runtime uploads / outputs
-web/output/
-web/uploads/
-web/temp/

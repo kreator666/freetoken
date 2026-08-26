@@ -1,188 +1,100 @@
-# dsh-realsee-agent
+# FreeToken — 看广告赚 AI Token 积分
 
-基于 [DeepSeek Harness (dsh)](https://github.com/deepseek-ai/deepseek-harness) 的插件化 Agent，用于：
+一个面向 ZCode、Claude Code、Codex、Trae、Cursor 等 AI Agent 的广告变现平台。
 
-1. **照片生成如视 VR 实景合影**：把用户照片中的人物抠出并合成到如视 VR 全景场景中。
-2. **照片生成如视 VR 实景视频**（第二阶段）：基于照片生成人物在 VR 实景中移动的短视频。
+当 Agent 检测到模型 provider 余额不足或 token 用量过高时，自动打开浏览器引导用户看广告 / 做任务赚取积分，积分可兑换成 provider token 额度。
 
-## 项目结构
+## 核心功能
 
-```
-dsh/
-├── src/                         # TypeScript / dsh 插件代码
-│   ├── index.ts                 # 插件入口与 context factory
-│   ├── config.ts                # 环境配置
-│   ├── types.ts                 # 共享类型
-│   ├── services/                # seam 能力层
-│   │   ├── realsee/             # 如视场景获取
-│   │   └── image/               # 图像处理
-│   ├── tools/                   # Agent 可调用的 tools
-│   │   ├── realsee.tool.ts
-│   │   └── image.tool.ts
-│   └── utils/
-│       └── python-runner.ts     # 调用 Python 后端的封装
-├── python/                      # Python 处理后端
-│   ├── realsee_adapter.py       # 如视全景图/元数据获取
-│   ├── image_pipeline.py        # 抠图 + 透视 + 合影合成
-│   └── video_pipeline.py        # 视频生成（第二阶段）
-├── web/                         # Node.js Web UI
-│   ├── server.ts                # HTTP 服务
-│   └── public/
-│       └── index.html           # 前端操作页面
-├── examples/
-│   └── group-photo.demo.ts      # 合影 demo
-└── assets/                      # 输入/输出目录（运行时创建）
-```
+- ✅ 多 Agent 通用：任何能读取 provider 配置并调用 HTTP 的 Agent 都能接入
+- ✅ 余额/用量监控：AIPing 余额、七牛 token 用量等
+- ✅ 广告墙变现：接入 Lootably / AdGate / AdGem 等 offerwall
+- ✅ 积分系统：postback 自动加积分，支持兑换申请
+- ✅ snooze 机制：用户可设置一段时间内不再提示
+- ✅ 本地 SQLite：MVP 阶段零成本启动
 
-## 前置要求
-
-- Node.js `^22.19.0 || >=24.0.0`
-- pnpm `11.7.0`（推荐用 `corepack enable` 启用）
-- Python `>=3.10`
-
-## 安装
-
-### 1. 安装 Node 依赖
+## 快速开始
 
 ```bash
+# 安装依赖
 pnpm install
-```
 
-### 2. 安装 Python 依赖
-
-```bash
-cd python
-pip install -e ".[gpu]"    # 若本地有 GPU，安装 torch + bria-rmbg
-# 或
-pip install -e .           # 仅 CPU 依赖，使用 GrabCut fallback 抠图
-```
-
-### 3. 配置环境变量
-
-```bash
+# 复制环境变量并填写广告平台配置
 cp .env.example .env
-# 编辑 .env，填入 DEEPSEEK_API_KEY
-# 如视 API Key 可选，MVP 可用本地全景图或 URL
+
+# 启动本地服务
+pnpm dev
 ```
 
-## 运行合影 Demo
+服务默认运行在 `http://127.0.0.1:3099`。
 
-### 方式一：Web UI（推荐）
+## 目录结构
 
-启动 Node.js Web 服务：
-
-```bash
-pnpm web
-# 或指定端口
-WEB_PORT=3081 pnpm web
+```
+ads-platform/
+├── server.ts          # Express 后端入口
+├── config.ts          # 配置与环境变量
+├── db.ts              # SQLite 数据层
+├── routes/
+│   ├── api.ts         # 积分、兑换、snooze 接口
+│   └── postback.ts    # 广告平台回调
+├── public/
+│   ├── warn.html      # 余额不足落地页
+│   └── dashboard.html # 用户积分面板
+└── hooks/zcode/       # ZCode hook 示例
 ```
 
-打开浏览器访问 `http://127.0.0.1:3081`：
+## Agent 接入
 
-1. 上传人物照片（建议人物居中、背景不太复杂的正面照）
-2. 上传 VR 全景图（推荐 2:1 等距圆柱全景图；或先下载示例：`python scripts/download-sample-panorama.py`）
-3. 调整 yaw/pitch/distance/scale 等参数
-4. 点击「生成合影」，页面会显示结果图片
+### 1. 在你的 Agent 中配置余额检查
 
-> 当前 MVP 使用轻量级 fallback 抠图，只能粗略提取人物中心区域。要获得完整、干净的抠图效果，请安装 GPU 依赖 `pip install -e ".[gpu]"`，或等待第二步接入 `bria-rmbg` / SAM2。
+参考 `ads-platform/hooks/zcode/check-balance.js`，当余额/用量低于阈值时打开：
 
-### 方式二：命令行
-
-准备：
-
-- 一张全景图放到 `assets/sample-panorama.jpg`（可用 `python scripts/download-sample-panorama.py` 下载示例）
-- 一张含有人物的照片放到 `assets/sample-person.jpg`
-
-或者用脚本生成测试素材（见下方）。
-
-执行：
-
-```bash
-pnpm demo:photo
+```
+http://127.0.0.1:3099/warn.html?provider=...&name=...&balance=...&threshold=...&user=...&type=...
 ```
 
-或直接调用 Python pipeline：
+### 2. 各 Agent 配置位置
 
-```bash
-# 1. 抠图
-python python/image_pipeline.py segment \
-  --input assets/sample-person.jpg \
-  --output-dir assets/temp/person
+| Agent | Provider 配置位置 |
+|---|---|
+| ZCode | `~/.zcode/v2/config.json` |
+| Claude Code | `~/.claude/config.json` |
+| Codex | `~/.codex/config.json` |
+| Trae / Cursor | 设置面板或项目配置 |
 
-# 2. 合成合影
-python python/image_pipeline.py group-photo \
-  --person assets/temp/person/person.png \
-  --scene assets/sample-panorama.jpg \
-  --output assets/output/group-photo.jpg \
-  --yaw 0 --pitch 0 --distance 3 --shadow --lighting
-```
+## 广告平台接入
 
-## 生成测试素材
+### Lootably（推荐）
 
-如果你没有现成的全景图和人物照片，可以用 Python 生成简单的测试图：
+1. 注册开发者账号：https://lootably.com
+2. 创建 offerwall
+3. 设置 postback URL：`https://你的域名/postback/lootably`
+4. 填写 `LOOTABLY_OFFERWALL_URL` 和 `LOOTABLY_SECRET`
 
-```bash
-python - <<'PY'
-from PIL import Image, ImageDraw
-import math
+### AdGate / AdGem（可选）
 
-# 简单全景图：蓝色天空 + 绿色地面 + 红色柱子
-w, h = 4096, 2048
-img = Image.new('RGB', (w, h), (135, 206, 235))
-d = ImageDraw.Draw(img)
-d.rectangle([0, h//2, w, h], fill=(34, 139, 34))
-for i in range(0, w, w//8):
-    d.rectangle([i + 40, h//2 - 300, i + 100, h//2], fill=(180, 60, 60))
-img.save('assets/sample-panorama.jpg')
+类似流程，填入对应环境变量即可。
 
-# 简单人物照片：紫色人形剪影
-pw, ph = 512, 768
-pimg = Image.new('RGBA', (pw, ph), (0, 0, 0, 0))
-d = ImageDraw.Draw(pimg)
-d.ellipse([pw*0.35, ph*0.05, pw*0.65, ph*0.25], fill=(147, 112, 219, 255))
-d.rectangle([pw*0.35, ph*0.25, pw*0.65, ph*0.85], fill=(147, 112, 219, 255))
-d.rectangle([pw*0.25, ph*0.35, pw*0.40, ph*0.75], fill=(147, 112, 219, 255))
-d.rectangle([pw*0.60, ph*0.35, pw*0.75, ph*0.75], fill=(147, 112, 219, 255))
-pimg.save('assets/sample-person.jpg')
-print('done')
-PY
-```
+## API 接口
 
-## 接入 DeepSeek Harness (dsh)
+| 接口 | 方法 | 说明 |
+|---|---|---|
+| `GET /api/health` | 健康检查 | |
+| `GET /api/points?user=xxx` | 查询积分 | |
+| `GET /api/redeems?user=xxx` | 查询兑换记录 | |
+| `POST /api/redeem` | 申请兑换 | `{user, points, provider}` |
+| `POST /api/snooze` | 设置 snooze | `user`, `provider`, `minutes` |
+| `GET /api/snooze-check` | 查询 snooze | `user`, `provider` |
+| `GET /postback/:provider` | 广告平台回调 | 由平台调用 |
 
-当前代码已实现了一个 **standalone context factory**（`src/index.ts` 中的 `createContext`），可以直接在脚本或测试中调用。
+## 未来扩展
 
-要作为 dsh 插件加载，需要把 `services/*` 注册到 Cordis 容器，并把 `tools/*` 注册到 dsh 的 tool registry。由于 `deepseek-harness` 源码未在本地，以下是预期接入方式：
+- [ ] 接入支付/自动充值 provider API
+- [ ] 用户登录系统，跨设备同步积分
+- [ ] 接入国内广告平台（穿山甲、优量汇）
+- [ ] 在 Agent 内部嵌入 WebView 广告墙
 
-```ts
-// src/plugin.ts (dsh 插件入口示例)
-import { Context, Service } from '@deepseek-ai/dsh'
-import { RealseeConsumer } from './services/realsee/consumer.js'
-import { ImageConsumer } from './services/image/consumer.js'
-import { realseeTools, imageTools } from './tools/index.js'
+## License
 
-export const name = 'realsee-agent'
-
-export function apply(ctx: Context) {
-  ctx.plugin('realsee-agent', {
-    apply(ctx) {
-      ctx.service('realsee', RealseeConsumer)
-      ctx.service('image', ImageConsumer)
-
-      for (const tool of [...realseeTools.tools, ...imageTools.tools]) {
-        ctx.effect(() => ctx.registry('tool').register(tool.name, tool))
-      }
-    },
-  })
-}
-```
-
-> 具体装饰器和注册 API（`ctx.service`、`ctx.registry` 等）需要对照本地 `deepseek-harness` 源码微调。
-
-## 下一步
-
-- [ ] 接入真实如视 OpenAPI（替换 `python/realsee_adapter.py` 的 MVP fallback）
-- [ ] 接入高质量人像抠图模型 `bria-rmbg` 或 SAM2
-- [ ] 接入光影融合模型 `IC-Light` / `ControlNet`
-- [ ] 实现第二阶段视频生成功能
-- [ ] 接入 dsh Cordis 容器，完成真实插件化
+MIT
