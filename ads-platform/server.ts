@@ -6,6 +6,7 @@ import { initDb } from './db.js'
 import { PORT, HOST, LOOTABLY_OFFERWALL_URL, ADGATE_WALL_URL, ADGEM_WALL_URL } from './config.js'
 import apiRouter from './routes/api.js'
 import postbackRouter from './routes/postback.js'
+import { buildEarnTokenPrompt } from './prompts.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -22,6 +23,32 @@ app.get('/api/config', (_req, res) => {
     adgateWallUrl: ADGATE_WALL_URL,
     adgemWallUrl: ADGEM_WALL_URL,
   })
+})
+
+// 生成标准化的「赚 Token」提示文本，供 Agent 插入到回复中
+app.get('/api/prompt', (req, res) => {
+  const userId = String(req.query.user || '')
+  const providerName = String(req.query.name || req.query.provider || '当前 provider')
+  const providerHost = String(req.query.provider || '')
+  const alertType = String(req.query.type || 'balance') as 'balance' | 'usage'
+  const value = Number(req.query.value || 0)
+  const threshold = Number(req.query.threshold || 0)
+
+  if (!userId || !providerHost) {
+    res.status(400).json({ error: 'missing user or provider' })
+    return
+  }
+
+  const prompt = buildEarnTokenPrompt({
+    userId,
+    providerName,
+    providerHost,
+    alertType,
+    value,
+    threshold,
+    serverUrl: `${req.protocol}://${req.get('host')}`,
+  })
+  res.json({ prompt })
 })
 
 // offerwall 落地页：服务器把用户 ID 注入 HTML，避免把 secret 暴露给客户端
@@ -63,6 +90,46 @@ app.get('/offerwall', (req, res) => {
 app.use('/api', apiRouter)
 app.use('/postback', postbackRouter)
 app.use(express.static(path.join(__dirname, 'public')))
+
+// 根路由：未提供 user 时展示入口页
+app.get('/', (req, res) => {
+  const userId = String(req.query.user || '')
+  if (userId) {
+    res.redirect(`/offerwall?user=${encodeURIComponent(userId)}`)
+    return
+  }
+  res.send(`<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>赚取 Token 积分</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; max-width: 600px; margin: 60px auto; padding: 0 20px; color: #333; }
+    h1 { font-size: 24px; }
+    label { display: block; margin: 20px 0 8px; }
+    input { width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+    button { margin-top: 16px; padding: 10px 20px; font-size: 16px; border: none; border-radius: 6px; background: #0066cc; color: #fff; cursor: pointer; }
+    button:hover { background: #0055aa; }
+  </style>
+</head>
+<body>
+  <h1>看广告 / 做任务赚积分</h1>
+  <p>输入你的用户 ID 进入任务墙。</p>
+  <label for="user">用户 ID</label>
+  <input id="user" type="text" placeholder="user-123" />
+  <button onclick="go()">进入</button>
+  <script>
+    function go() {
+      const user = document.getElementById('user').value.trim()
+      if (!user) { alert('请输入用户 ID'); return }
+      window.location.href = '/offerwall?user=' + encodeURIComponent(user)
+    }
+    document.getElementById('user').addEventListener('keydown', (e) => { if (e.key === 'Enter') go() })
+  </script>
+</body>
+</html>`)
+})
 
 async function main() {
   initDb()

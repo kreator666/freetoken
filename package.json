@@ -9,14 +9,17 @@
   "packageManager": "pnpm@11.7.0",
   "scripts": {
     "dev": "tsx ads-platform/server.ts",
+    "mcp": "tsx ads-platform/mcp/server.ts",
     "start": "node dist/ads-platform/server.js",
     "db:reset": "tsx ads-platform/scripts/reset-db.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "better-sqlite3": "^13.0.3",
     "dotenv": "^16.4.5",
-    "express": "^4.21.0"
+    "express": "^4.21.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",

@@ -1,5 +1,6 @@
 import path from 'node:path'
 import os from 'node:os'
+import crypto from 'node:crypto'
 
 export const PORT = Number(process.env.ADS_PORT || 3099)
 export const HOST = process.env.ADS_HOST || '127.0.0.1'
@@ -29,5 +30,5 @@ export const DAILY_POINTS_CAP = 500 // 5 USD
 // 生成跨 Agent 的用户标识
 export function getMachineId(): string {
   const info = [os.hostname(), os.userInfo().username, os.platform()].join('|')
-  return require('node:crypto').createHash('sha256').update(info).digest('hex').slice(0, 16)
+  return crypto.createHash('sha256').update(info).digest('hex').slice(0, 16)
 }

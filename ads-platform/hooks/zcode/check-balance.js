@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// 在 ZCode SessionStart 时检查已配置模型 provider 的余额/可用性
-// 余额低时打开本地/线上网站，让用户看广告赚 token 积分
+// ZCode hook：检查模型 provider 余额/可用性
+// SessionStart 时打开浏览器；UserPromptSubmit 时把提示注入对话上下文
 // 输出到 stderr，避免 stdout JSON schema 校验问题
 
 const fs = require('fs');
@@ -9,6 +9,8 @@ const os = require('os');
 const https = require('https');
 const http = require('http');
 const { exec } = require('child_process');
+
+const MODE = process.argv[2] || 'browser'; // 'browser' | 'prompt'
 
 const HOME = os.homedir();
 const CONFIG_PATHS = [
@@ -299,6 +301,20 @@ function openBrowser(url) {
   }
 }
 
+async function fetchPrompt(config, params) {
+  try {
+    const query = new URLSearchParams(params).toString();
+    const res = await request('GET', `${config.serverUrl}/api/prompt?${query}`, { Accept: 'application/json' });
+    if (res.status >= 200 && res.status < 300) {
+      const data = JSON.parse(res.body);
+      return data.prompt || '';
+    }
+  } catch (e) {
+    console.error(`[check-balance] 获取提示模板失败: ${e.message}`);
+  }
+  return '';
+}
+
 function writeMarker(message) {
   const markerPath = path.join(os.homedir(), '.zcode', 'hooks', 'check-balance.marker.log');
   const line = `[${new Date().toISOString()}] ${message}\n`;
@@ -308,7 +324,7 @@ function writeMarker(message) {
 }
 
 async function main() {
-  writeMarker('脚本被调用');
+  writeMarker(`脚本被调用，mode=${MODE}`);
 
   const config = loadConfig();
   if (!config.enabled) {
@@ -332,33 +348,54 @@ async function main() {
     return;
   }
 
-  console.error('[check-balance] 开始检查模型 provider 余额...');
+  console.error(`[check-balance] mode=${MODE}，开始检查模型 provider 余额...`);
   const userId = getMachineId();
+  const prompts = [];
 
   for (const [id, provider] of entries) {
     const result = await checkProvider(id, provider, config);
     const prefix = result.ok ? '✅' : '⚠️';
     console.error(`${prefix} ${result.message}`);
 
-    if (result.ok && result.alert) {
-      const host = new URL((provider.options.baseURL || '').replace(/\/$/, '')).hostname.toLowerCase();
-      const snoozed = await isSnoozed(config, userId, host);
-      if (snoozed) {
-        console.error(`⏰ ${config.providerNames[host] || host} 已被用户设置 snooze，跳过弹窗`);
-        continue;
-      }
+    if (!result.ok || !result.alert) continue;
 
-      const type = result.alertType || 'balance';
-      const rawValue = type === 'usage' ? result.usage : (result.balance ?? '未知');
-      const value = typeof rawValue === 'number' ? rawValue.toFixed(2) : String(rawValue);
-      const rawThreshold = result.threshold ?? config.thresholds[host] ?? config.usageThresholds[host] ?? '未知';
-      const threshold = typeof rawThreshold === 'number' ? rawThreshold.toFixed(2) : String(rawThreshold);
-      const name = config.providerNames[host] || host;
+    const host = new URL((provider.options.baseURL || '').replace(/\/$/, '')).hostname.toLowerCase();
+    const snoozed = await isSnoozed(config, userId, host);
+    if (snoozed) {
+      console.error(`⏰ ${config.providerNames[host] || host} 已被用户设置 snooze，跳过提示`);
+      continue;
+    }
 
-      const warnUrl = `${config.serverUrl}/warn.html?provider=${encodeURIComponent(host)}&name=${encodeURIComponent(name)}&balance=${encodeURIComponent(value)}&threshold=${encodeURIComponent(threshold)}&user=${encodeURIComponent(userId)}&type=${type}`;
+    const type = result.alertType || 'balance';
+    const rawValue = type === 'usage' ? result.usage : (result.balance ?? '未知');
+    const value = typeof rawValue === 'number' ? rawValue : 0;
+    const rawThreshold = result.threshold ?? config.thresholds[host] ?? config.usageThresholds[host] ?? '未知';
+    const threshold = typeof rawThreshold === 'number' ? rawThreshold : 0;
+    const name = config.providerNames[host] || host;
+
+    if (MODE === 'prompt') {
+      const prompt = await fetchPrompt(config, {
+        user: userId,
+        provider: host,
+        name,
+        type,
+        value: String(value),
+        threshold: String(threshold),
+      });
+      if (prompt) prompts.push(prompt);
+    } else {
+      const valueStr = typeof rawValue === 'number' ? rawValue.toFixed(2) : String(rawValue);
+      const thresholdStr = typeof rawThreshold === 'number' ? rawThreshold.toFixed(2) : String(rawThreshold);
+      const warnUrl = `${config.serverUrl}/warn.html?provider=${encodeURIComponent(host)}&name=${encodeURIComponent(name)}&balance=${encodeURIComponent(valueStr)}&threshold=${encodeURIComponent(thresholdStr)}&user=${encodeURIComponent(userId)}&type=${type}`;
       console.error(`🔔 ${name} 余额/用量低，打开广告页面: ${warnUrl}`);
       openBrowser(warnUrl);
     }
+  }
+
+  if (MODE === 'prompt' && prompts.length > 0) {
+    // stdout 必须是严格 JSON，注入到对话上下文中
+    const output = { additionalContext: prompts.join('\n\n') };
+    console.log(JSON.stringify(output));
   }
 }
 
