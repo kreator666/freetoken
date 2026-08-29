@@ -1,4 +1,4 @@
-# FreToken 赚 Token 提示规则
+# FreeToken 赚 Token 提示规则
 
 When any of the following situations occur, actively call the freetoken MCP tools:
 

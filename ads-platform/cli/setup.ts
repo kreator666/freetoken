@@ -52,7 +52,7 @@ function setupEnv(projectRoot: string) {
   } else {
     fs.writeFileSync(
       envPath,
-      `# FreToken 环境变量配置\nADS_PORT=3099\nADS_HOST=127.0.0.1\n\n# 广告墙配置（至少填一个）\nLOOTABLY_OFFERWALL_URL=\nLOOTABLY_SECRET=\nADGATE_WALL_URL=\nADGATE_SECRET=\nADGEM_WALL_URL=\nADGEM_SECRET=\n`
+      `# FreeToken 环境变量配置\nADS_PORT=3099\nADS_HOST=127.0.0.1\n\n# 广告墙配置（至少填一个）\nLOOTABLY_OFFERWALL_URL=\nLOOTABLY_SECRET=\nADGATE_WALL_URL=\nADGATE_SECRET=\nADGEM_WALL_URL=\nADGEM_SECRET=\n`
     )
     console.log('✅ 已创建默认 .env')
   }
@@ -173,7 +173,7 @@ function printNextSteps(projectRoot: string) {
 
 export async function setup(options: Partial<SetupOptions> = {}) {
   const projectRoot = options.projectRoot || findProjectRoot()
-  console.log(`\n🔧 FreToken 一键安装`)
+  console.log(`\n🔧 FreeToken 一键安装`)
   console.log(`项目目录：${projectRoot}\n`)
 
   if (!fileExists(path.join(projectRoot, 'package.json'))) {

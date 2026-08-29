@@ -1,4 +1,4 @@
-# FreToken 赚 Token 提示规则
+# FreeToken 赚 Token 提示规则
 
 当对话涉及以下场景时，请主动调用 freetoken MCP tools：
 

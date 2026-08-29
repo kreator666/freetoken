@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// FreToken 一键安装脚本
+// FreeToken 一键安装脚本
 // 用法：node -e "$(curl -fsSL https://raw.githubusercontent.com/kreator666/freetoken/main/install.js)"
 //  或：curl -fsSL https://raw.githubusercontent.com/kreator666/freetoken/main/install.js | node
 
@@ -28,7 +28,7 @@ function exists(p) {
 }
 
 function main() {
-  console.log('\n🚀 FreToken 一键安装\n');
+  console.log('\n🚀 FreeToken 一键安装\n');
 
   // 检查 git
   try {
@@ -48,14 +48,14 @@ function main() {
 
   // 克隆或更新代码
   if (exists(path.join(INSTALL_DIR, '.git'))) {
-    console.log('📥 更新 FreToken 代码...');
+    console.log('📥 更新 FreeToken 代码...');
     run('git pull origin main', INSTALL_DIR);
   } else {
     if (exists(INSTALL_DIR)) {
       console.log('⚠️  目录已存在，先备份...');
       fs.renameSync(INSTALL_DIR, `${INSTALL_DIR}.backup.${Date.now()}`);
     }
-    console.log('📥 下载 FreToken 代码...');
+    console.log('📥 下载 FreeToken 代码...');
     run(`git clone --depth 1 -b ${BRANCH} ${REPO_URL} "${INSTALL_DIR}"`, HOME);
   }
 

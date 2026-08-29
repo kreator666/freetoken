@@ -14,7 +14,7 @@ async function main() {
     case '--help':
     case '-h':
       console.log(`
-FreToken CLI
+FreeToken CLI
 
 用法：
   freetoken setup       一键安装并配置 Agent
