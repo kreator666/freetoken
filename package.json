@@ -7,11 +7,15 @@
     "node": "^22.0.0 || >=24.0.0"
   },
   "packageManager": "pnpm@11.7.0",
+  "bin": {
+    "freetoken": "bin/freetoken.cjs"
+  },
   "scripts": {
-    "dev": "tsx ads-platform/server.ts",
-    "mcp": "tsx ads-platform/mcp/server.ts",
+    "dev": "node --import tsx ads-platform/server.ts",
+    "mcp": "node --import tsx ads-platform/mcp/server.ts",
+    "setup": "node --import tsx ads-platform/cli/index.ts setup",
     "start": "node dist/ads-platform/server.js",
-    "db:reset": "tsx ads-platform/scripts/reset-db.ts",
+    "db:reset": "node --import tsx ads-platform/scripts/reset-db.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

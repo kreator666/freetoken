@@ -16,21 +16,55 @@
 
 ## 快速开始
 
+### 方式一：一键安装（推荐）
+
+不需要先下载代码，一条命令自动下载、安装依赖、配置 Agent：
+
 ```bash
+node -e "$(curl -fsSL https://raw.githubusercontent.com/kreator666/freetoken/main/install.js)"
+```
+
+或在 Windows PowerShell：
+
+```powershell
+(Invoke-WebRequest -Uri https://raw.githubusercontent.com/kreator666/freetoken/main/install.js -UseBasicParsing).Content | node -
+```
+
+安装脚本会：
+1. 把代码下载到 `~/.freetoken`
+2. 安装依赖
+3. 自动配置 ZCode / Claude Code / Codex / Cursor
+4. 创建默认 `.env`
+
+安装完成后：
+1. 编辑 `~/.freetoken/.env`，填入广告墙 URL
+2. 启动服务：`cd ~/.freetoken && pnpm dev`
+3. 完全退出并重新打开你的 Agent
+
+### 方式二：手动安装
+
+```bash
+# 克隆代码
+git clone https://github.com/kreator666/freetoken.git
+cd freetoken
+
 # 安装依赖
 pnpm install
 
-# 复制环境变量并填写广告平台配置
-cp .env.example .env
-
-# 启动本地服务
-pnpm dev
-
-# 启动 MCP server（stdio）
-node --import tsx ads-platform/mcp/server.ts
+# 一键配置 Agent
+pnpm setup
 ```
 
 服务默认运行在 `http://127.0.0.1:3099`。
+
+### 方式三：npm 全局安装（发布后）
+
+```bash
+npm install -g freetoken
+freetoken setup
+```
+
+> 目前需要先发布到 npm。如果你自己有 npm 账号，可以运行 `npm publish` 发布。
 
 ## 目录结构
 
