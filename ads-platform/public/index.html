@@ -268,35 +268,28 @@
 
     <section class="card">
       <h2>安装 MCP Server</h2>
-      <p>将以下配置添加到你的 Agent MCP 设置中（推荐 stdio 方式）：</p>
+      <h3 style="color: #00cc33; margin: 20px 0 10px; font-size: 1.1rem;">方式一：远程一键安装（推荐）</h3>
+      <p>不需要先下载代码，一条命令自动完成下载、安装依赖、配置 Agent：</p>
       <div class="code-block">
         <button class="copy-btn" onclick="copyCode(this)">复制</button>
-        <pre id="mcp-config">{
-  "freetoken": {
-    "type": "stdio",
-    "command": "node",
-    "args": [
-      "--import",
-      "tsx",
-      "D:/agent/freetoken/ads-platform/mcp/server.ts"
-    ],
-    "cwd": "D:/agent/freetoken"
-  }
-}</pre>
+        <pre id="install-cmd">node -e &quot;$(curl -fsSL https://raw.githubusercontent.com/kreator666/freetoken/main/install.js)&quot;</pre>
       </div>
-      <p>暴露 tools：<code>check_balance</code>、<code>get_earn_token_prompt</code>、<code>get_user_points</code>、<code>request_redeem</code>、<code>snooze_reminder</code>、<code>is_snoozed</code>、<code>open_offerwall</code>。</p>
-    </section>
-
-    <section class="card">
-      <h2>启动服务</h2>
+      <p>Windows PowerShell：</p>
       <div class="code-block">
         <button class="copy-btn" onclick="copyCode(this)">复制</button>
-        <pre># 启动 HTTP 服务
-pnpm dev
-
-# 启动 MCP server（stdio）
-node --import tsx ads-platform/mcp/server.ts</pre>
+        <pre>(Invoke-WebRequest -Uri https://raw.githubusercontent.com/kreator666/freetoken/main/install.js -UseBasicParsing).Content | node -</pre>
       </div>
+
+      <h3 style="color: #00cc33; margin: 40px 0 10px; font-size: 1.1rem;">方式二：已有代码配置</h3>
+      <p>如果已经下载了 freetoken 代码，在项目目录内运行：</p>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+        <pre>pnpm setup
+# 或
+node bin/freetoken.cjs setup</pre>
+      </div>
+
+      <p style="margin-top: 24px;">安装完成后，暴露的 tools： <code>check_balance</code>、<code>get_earn_token_prompt</code>、<code>get_user_points</code>、<code>request_redeem</code>、<code>snooze_reminder</code>、<code>is_snoozed</code>、<code>open_offerwall</code>。</p>
     </section>
 
     <section class="card enter-section">
