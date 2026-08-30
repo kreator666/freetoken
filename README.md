@@ -122,11 +122,13 @@ FreeToken 提供 stdio MCP server，所有支持 MCP 的 Agent 都能复用：
 | Agent | 触发方式 | 是否每次对话自动触发 |
 |---|---|---|
 | **ZCode** | `UserPromptSubmit` hook + MCP `/api/prompt` | ✅ 是 |
+| **Trae** | MCP + 项目 instructions | ⚠️ 依赖模型自律 |
+| **VSCode + Kimi Code** | MCP + 项目 instructions | ⚠️ 依赖模型自律 |
 | **Claude Code** | AGENTS.md / project instructions | ⚠️ 依赖模型自律 |
 | **Codex** | instructions.md | ⚠️ 依赖模型自律 |
 | **Cursor** | .cursorrules | ⚠️ 依赖模型自律 |
 
-> 注意：MCP server 本身是被动的，必须由 Agent 调用。目前只有 ZCode 的 hook 机制能真正做到"每次对话前强制检查余额并插入提示"。其他 Agent 需要依靠 instructions 引导模型主动调用 tools。
+> 注意：MCP server 本身是被动的，必须由 Agent 调用。目前只有 ZCode 的 hook 机制能真正做到"每次对话前强制检查余额并插入提示"。其他 Agent 需要依靠 MCP tools + instructions 引导模型主动调用 tools。
 
 ### ZCode 快速配置
 
@@ -137,6 +139,52 @@ FreeToken 提供 stdio MCP server，所有支持 MCP 的 Agent 都能复用：
    cp ads-platform/hooks/zcode/check-balance.config.json ~/.zcode/hooks/
    ```
 3. 重启 ZCode
+
+### Trae 快速配置
+
+Trae 通过 MCP server 接入。一键安装脚本会自动写入 `~/.trae/mcp_config.json`：
+
+```json
+{
+  "mcpServers": {
+    "freetoken": {
+      "command": "node",
+      "args": [
+        "--import",
+        "tsx",
+        "/path/to/freetoken/ads-platform/mcp/server.ts"
+      ],
+      "cwd": "/path/to/freetoken"
+    }
+  }
+}
+```
+
+如果自动配置没有生效，手动在 Trae 设置面板的 **MCP / 模型上下文协议** 中添加以上 server，然后重启 Trae。
+
+### VSCode + Kimi Code 快速配置
+
+Kimi Code 插件通过 VSCode 的 `settings.json` 配置 MCP server。一键安装脚本会尝试写入 `~/.vscode/settings.json`：
+
+```json
+{
+  "kimi.mcpServers": {
+    "freetoken": {
+      "command": "node",
+      "args": [
+        "--import",
+        "tsx",
+        "/path/to/freetoken/ads-platform/mcp/server.ts"
+      ],
+      "cwd": "/path/to/freetoken"
+    }
+  }
+}
+```
+
+> 注意：Kimi Code 插件不同版本的 MCP 配置键名可能不同（如 `kimi.code.mcpServers`、`kimi.mcpServers` 等）。如果上述键名不生效，请查看 Kimi Code 插件的官方文档或设置面板，找到对应的 MCP server 入口，手动复制以上 `command/args/cwd`。
+
+配置完成后，完全重启 VSCode。
 
 ### 其他 Agent
 

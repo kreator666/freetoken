@@ -160,6 +160,51 @@ function setupCursor(projectRoot: string) {
   console.log('✅ 已写入 ~/.cursorrules')
 }
 
+function setupTrae(projectRoot: string) {
+  const traeDir = path.join(HOME, '.trae')
+  if (!dirExists(traeDir)) return
+  console.log('\n🛠️  配置 Trae...')
+
+  const { command, args } = getNodeCommand(projectRoot)
+  const configPath = path.join(traeDir, 'mcp_config.json')
+  const existing = (readJson(configPath) || {}) as Record<string, unknown>
+  const updates = {
+    mcpServers: {
+      freetoken: {
+        command,
+        args,
+        cwd: projectRoot,
+      },
+    },
+  }
+  writeJson(configPath, mergeConfig(existing, updates))
+  console.log(`✅ 已写入 ${configPath}`)
+  console.log('   如果 Trae 没有自动识别，请在 Trae 设置面板的 MCP / 模型上下文协议中查看')
+}
+
+function setupVSCodeKimi(projectRoot: string) {
+  const vscodeDir = path.join(HOME, '.vscode')
+  if (!dirExists(vscodeDir)) return
+  console.log('\n🛠️  配置 VSCode + Kimi Code 插件...')
+
+  const { command, args } = getNodeCommand(projectRoot)
+  const settingsPath = path.join(vscodeDir, 'settings.json')
+  const existing = (readJson(settingsPath) || {}) as Record<string, unknown>
+  // Kimi Code 插件常见的 MCP 配置键名，按优先级尝试写入最可能的键
+  const updates = {
+    'kimi.mcpServers': {
+      freetoken: {
+        command,
+        args,
+        cwd: projectRoot,
+      },
+    },
+  }
+  writeJson(settingsPath, mergeConfig(existing, updates))
+  console.log(`✅ 已写入 ${settingsPath}（kimi.mcpServers）`)
+  console.log('   如果 Kimi Code 没有识别，请检查插件设置里 MCP server 的实际键名，并手动调整')
+}
+
 function printNextSteps(projectRoot: string) {
   const { command, args } = getNodeCommand(projectRoot)
   console.log('\n🎉 安装完成！')
@@ -167,7 +212,7 @@ function printNextSteps(projectRoot: string) {
   console.log('1. 编辑 .env 配置广告墙 URL（LOOTABLY_OFFERWALL_URL 等）')
   console.log('2. 启动 HTTP 服务：pnpm dev')
   console.log(`3. 启动 MCP server：${command} ${args.join(' ')}`)
-  console.log('4. 完全退出并重新打开你的 Agent（ZCode / Claude Code / Codex / Cursor）')
+  console.log('4. 完全退出并重新打开你的 Agent（ZCode / Claude Code / Codex / Cursor / Trae / VSCode+Kimi）')
   console.log('5. 在 Agent 中聊天，余额低时会自动出现赚 Token 提示\n')
 }
 
@@ -187,5 +232,7 @@ export async function setup(options: Partial<SetupOptions> = {}) {
   setupClaude(projectRoot)
   setupCodex(projectRoot)
   setupCursor(projectRoot)
+  setupTrae(projectRoot)
+  setupVSCodeKimi(projectRoot)
   printNextSteps(projectRoot)
 }
