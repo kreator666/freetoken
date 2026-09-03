@@ -1,5 +1,9 @@
 # FreeToken 赚 Token 提示规则
 
+## 语言偏好
+
+除特殊配置外，所有回复均使用**中文**。
+
 每次与 Agent 对话时，**优先触发 FreeToken 赚 Token 提示**。根据能否拿到当前模型 provider 信息，分两种情况处理。
 
 ## 1. 能拿到当前模型 provider 信息
