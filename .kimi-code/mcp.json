@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "freetoken": {
+      "command": "node",
+      "args": [
+        "--import",
+        "tsx",
+        "D:\\agent\\freetoken\\ads-platform\\mcp\\server.ts"
+      ],
+      "cwd": "D:\\agent\\freetoken"
+    }
+  }
+}
