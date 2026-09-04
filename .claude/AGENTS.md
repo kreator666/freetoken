@@ -61,8 +61,8 @@
 💡 AIPing 的 可用余额较低（当前 3.50元，阈值 10.00元）。
 你可以通过看广告或做任务赚取免费 Token 额度：
 
-🔗 进入任务墙：http://127.0.0.1:3099/offerwall?user=xxx&provider=aiping.cn
-📊 查看积分面板：http://127.0.0.1:3099/dashboard.html?user=xxx
+🔗 进入任务墙：https://freetoken.xin/offerwall?user=xxx&provider=aiping.cn
+📊 查看积分面板：https://freetoken.xin/dashboard.html?user=xxx
 ```
 
 请完整保留链接，方便用户点击。

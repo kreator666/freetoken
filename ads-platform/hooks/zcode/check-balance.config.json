@@ -1,6 +1,6 @@
 {
   "enabled": true,
-  "serverUrl": "http://127.0.0.1:3099",
+  "serverUrl": "https://freetoken.xin",
   "thresholds": {
     "aiping.cn": 10,
     "api.z.ai": 5,

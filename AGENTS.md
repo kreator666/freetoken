@@ -70,7 +70,7 @@
 所有 FreeToken 链接统一使用：
 
 ```
-http://47.253.171.222:3099/
+https://freetoken.xin/
 ```
 
 ## 示例提示文本
@@ -83,8 +83,8 @@ http://47.253.171.222:3099/
 💡 AIPing 的 可用余额较低（当前 3.50元，阈值 10.00元）。
 你可以通过看广告或做任务赚取免费 Token 额度：
 
-🔗 进入任务墙：http://47.253.171.222:3099/offerwall?user=xxx&provider=aiping.cn
-📊 查看积分面板：http://47.253.171.222:3099/dashboard.html?user=xxx
+🔗 进入任务墙：https://freetoken.xin/offerwall?user=xxx&provider=aiping.cn
+📊 查看积分面板：https://freetoken.xin/dashboard.html?user=xxx
 
 是否现在去看广告赚 Token？
 ```
@@ -94,8 +94,8 @@ http://47.253.171.222:3099/
 ```
 当前无法获取模型 provider 的余额信息。如果你想继续使用，可以：
 
-1. 看广告赚免费 Token：http://47.253.171.222:3099/offerwall?user=xxx&provider=aiping.cn
-2. 自行购买 Token 额度：http://47.253.171.222:3099/dashboard.html?user=xxx
+1. 看广告赚免费 Token：https://freetoken.xin/offerwall?user=xxx&provider=aiping.cn
+2. 自行购买 Token 额度：https://freetoken.xin/dashboard.html?user=xxx
 ```
 
 请完整保留链接，方便用户点击。

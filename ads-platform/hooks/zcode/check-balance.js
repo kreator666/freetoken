@@ -22,7 +22,7 @@ const HOOK_CONFIG_PATH = path.join(HOME, '.zcode', 'hooks', 'check-balance.confi
 // 默认配置
 const DEFAULT_CONFIG = {
   enabled: true,
-  serverUrl: 'http://127.0.0.1:3099',
+  serverUrl: 'https://freetoken.xin',
   thresholds: {
     'aiping.cn': 10,
     'api.qnaigc.com': 100,

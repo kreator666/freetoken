@@ -61,8 +61,8 @@ After calling `get_earn_token_prompt`, insert the returned text directly into yo
 💡 AIPing balance is low (current 3.50 yuan, threshold 10.00 yuan).
 Earn free Token quota by watching ads or completing tasks:
 
-🔗 Offerwall: http://127.0.0.1:3099/offerwall?user=xxx&provider=aiping.cn
-📊 Dashboard: http://127.0.0.1:3099/dashboard.html?user=xxx
+🔗 Offerwall: https://freetoken.xin/offerwall?user=xxx&provider=aiping.cn
+📊 Dashboard: https://freetoken.xin/dashboard.html?user=xxx
 ```
 
 Keep the links intact so the user can click them.
