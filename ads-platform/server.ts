@@ -68,9 +68,6 @@ app.get('/api/prompt', (req, res) => {
 app.get('/offerwall', (req, res) => {
   const userId = String(req.query.user || '')
   const provider = String(req.query.provider || '')
-  const wallUrl = LOOTABLY_OFFERWALL_URL || ADGATE_WALL_URL || ADGEM_WALL_URL || ''
-  const separator = wallUrl.includes('?') ? '&' : '?'
-  const fullUrl = wallUrl ? `${wallUrl}${separator}user_id=${encodeURIComponent(userId)}` : ''
 
   res.send(`<!DOCTYPE html>
 <html lang="zh-CN">
@@ -78,6 +75,7 @@ app.get('/offerwall', (req, res) => {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>赚取 Token 积分</title>
+  <script src="https://pl31183946.profitableratecpmnetwork.com/bb/c5/b7/bbc5b73ec72e2240a8502f5c5e8d4d49.js"></script>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
     h1 { color: #333; }
@@ -91,10 +89,7 @@ app.get('/offerwall', (req, res) => {
   <h1>看广告 / 做任务赚积分</h1>
   <p>当前用户：<code>${userId}</code> · Provider：<code>${provider || 'default'}</code></p>
   <div class="box">
-    <p>完成任务后积分会自动到账。可在 <a href="/dashboard.html?user=${encodeURIComponent(userId)}">积分面板</a> 查看。</p>
-    ${fullUrl
-      ? `<iframe src="${fullUrl}" allow="clipboard-write"></iframe>`
-      : '<p class="empty">⚠️ 管理员尚未配置广告墙 URL，请在 .env 中设置 LOOTABLY_OFFERWALL_URL 等环境变量。</p>'}
+    <p>完成页面上的任务后积分会自动到账。可在 <a href="/dashboard.html?user=${encodeURIComponent(userId)}">积分面板</a> 查看。</p>
   </div>
 </body>
 </html>`)
