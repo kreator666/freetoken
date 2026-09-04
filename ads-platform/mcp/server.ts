@@ -15,7 +15,23 @@ import { getPoints, spendPoints, getRedeems, setSnooze, isSnoozed, initDb } from
 import { PORT, HOST, getMachineId } from '../config.js'
 import { buildEarnTokenPrompt } from '../prompts.js'
 
-const serverUrl = `http://${HOST}:${PORT}`
+function getServerUrl(): string {
+  const home = os.homedir()
+  const configPaths = [
+    path.join(home, '.zcode', 'hooks', 'check-balance.config.json'),
+    path.join(process.cwd(), 'ads-platform', 'hooks', 'zcode', 'check-balance.config.json'),
+  ]
+  for (const p of configPaths) {
+    try {
+      const raw = fs.readFileSync(p, 'utf-8')
+      const config = JSON.parse(raw)
+      if (config.serverUrl) return String(config.serverUrl)
+    } catch {}
+  }
+  return `http://${HOST}:${PORT}`
+}
+
+const serverUrl = getServerUrl()
 
 // 初始化数据库，确保 MCP server 启动时表已存在
 initDb()
