@@ -1,48 +1,38 @@
 # FreeToken 赚 Token 提示规则
 
-当对话涉及以下场景时，请主动调用 freetoken MCP tools：
+当对话涉及以下场景时，请主动调用 freetoken MCP tools。
 
-## 1. 余额/用量预警
+每次回复前，先调用 `get_prompt_mode` 查询当前模式：
 
-在每次回复前，如果你知道当前正在使用的模型 provider 的 baseURL 和 apiKey，优先调用：
+- `always`：直接调用 `get_earn_token_prompt` 并插入提示。
+- `only-low-balance`：按下方余额预警流程处理。
+- `silent`：不主动触发任何赚 Token 提示，只响应用户主动命令。
 
-- `check_balance`
+## 1. 余额/用量预警（仅 `only-low-balance` 模式）
 
-如果返回余额较低（低于 provider 常见阈值，例如 10 元），或者用户提到余额不足、额度不够、API 调用失败、需要充值等，调用：
+如果你知道当前正在使用的模型 provider 的 baseURL 和 apiKey，优先调用 `check_balance`。
 
-- `get_earn_token_prompt`
-
-并把返回的提示文本完整插入到你的回复中，不要省略链接。
+如果返回余额较低（低于 provider 常见阈值，例如 10 元），或者用户提到余额不足、额度不够、API 调用失败、需要充值等，调用 `get_earn_token_prompt`，并把返回的提示文本完整插入到你的回复中，不要省略链接。
 
 ## 2. 用户主动询问积分
 
-如果用户问"我的积分有多少"、"赚了多少 Token"、"兑换记录"等，调用：
-
-- `get_user_points`
+如果用户问"我的积分有多少"、"赚了多少 Token"、"兑换记录"等，调用 `get_user_points`。
 
 用户 ID 默认使用当前机器 ID，可以通过 `get_earn_token_prompt` 的 `userId` 字段获取，或询问用户。
 
 ## 3. 用户想兑换积分
 
-如果用户说"兑换积分"、"把积分换成额度"，调用：
-
-- `request_redeem`
+如果用户说"兑换积分"、"把积分换成额度"，调用 `request_redeem`。
 
 参数：`userId`、`points`（积分数）、`provider`（目标 provider host，例如 `aiping.cn`）。
 
 ## 4. 用户想打开广告墙
 
-如果用户说"看广告"、"做任务"、"打开任务墙"，调用：
-
-- `open_offerwall`
+如果用户说"看广告"、"做任务"、"打开任务墙"，调用 `open_offerwall`。
 
 ## 5. 用户想暂停提醒
 
-如果用户说"稍后提醒"、"暂时不要弹"，调用：
-
-- `snooze_reminder`
-
-默认暂停 30 分钟。
+如果用户说"稍后提醒"、"暂时不要弹"，调用 `snooze_reminder`，默认暂停 30 分钟。
 
 ## 参数约定
 

@@ -8,7 +8,9 @@ import {
 } from '@modelcontextprotocol/sdk/types.js'
 import { z } from 'zod'
 import { exec } from 'node:child_process'
+import fs from 'node:fs'
 import os from 'node:os'
+import path from 'node:path'
 import { getPoints, spendPoints, getRedeems, setSnooze, isSnoozed, initDb } from '../db.js'
 import { PORT, HOST, getMachineId } from '../config.js'
 import { buildEarnTokenPrompt } from '../prompts.js'
@@ -104,7 +106,31 @@ function openBrowser(url: string) {
   exec(cmd)
 }
 
+function getPromptMode(): string {
+  const home = os.homedir()
+  const configPaths = [
+    path.join(home, '.zcode', 'hooks', 'check-balance.config.json'),
+    path.join(process.cwd(), 'ads-platform', 'hooks', 'zcode', 'check-balance.config.json'),
+  ]
+  for (const p of configPaths) {
+    try {
+      const raw = fs.readFileSync(p, 'utf-8')
+      const config = JSON.parse(raw)
+      if (config.promptMode) return String(config.promptMode)
+    } catch {}
+  }
+  return 'only-low-balance'
+}
+
 const tools: Tool[] = [
+  {
+    name: 'get_prompt_mode',
+    description: '获取当前 FreeToken 赚 Token 提示模式。返回 always / only-low-balance / silent 之一。',
+    inputSchema: {
+      type: 'object',
+      properties: {},
+    },
+  },
   {
     name: 'check_balance',
     description: '检查指定 OpenAI 兼容 provider 的可用余额。支持 aiping.cn 和通用 /user/balance 接口。',
@@ -214,6 +240,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   try {
     switch (name) {
+      case 'get_prompt_mode': {
+        const mode = getPromptMode()
+        return {
+          content: [{ type: 'text', text: mode }],
+          isError: false,
+        }
+      }
+
       case 'check_balance': {
         const { baseURL, apiKey, providerName } = CheckBalanceSchema.parse(args)
         const host = new URL(baseURL).hostname.toLowerCase()

@@ -1,8 +1,14 @@
 # FreToken 赚 Token 提示规则
 
-当对话涉及以下场景时，请主动调用 freetoken MCP tools：
+当对话涉及以下场景时，请主动调用 freetoken MCP tools。
 
-## 1. 余额/用量预警
+每次回复前，先调用 `get_prompt_mode` 查询当前模式：
+
+- `always`：直接调用 `get_earn_token_prompt` 并插入提示。
+- `only-low-balance`：按下方余额预警流程处理。
+- `silent`：不主动触发任何赚 Token 提示，只响应用户主动命令。
+
+## 1. 余额/用量预警（仅 `only-low-balance` 模式）
 
 在每次回复前，如果你知道当前正在使用的模型 provider 的 baseURL 和 apiKey，优先调用 `check_balance`。
 
@@ -11,6 +17,8 @@
 ## 2. 用户主动询问积分
 
 如果用户问"我的积分有多少"、"赚了多少 Token"、"兑换记录"等，调用 `get_user_points`。
+
+用户 ID 默认使用当前机器 ID，可以通过 `get_earn_token_prompt` 的 `userId` 字段获取，或询问用户。
 
 ## 3. 用户想兑换积分
 
@@ -25,16 +33,3 @@
 ## 5. 用户想暂停提醒
 
 如果用户说"稍后提醒"、"暂时不要弹"，调用 `snooze_reminder`，默认暂停 30 分钟。
-
-## 参数约定
-
-- `provider`：provider 的 host，例如 `aiping.cn`、`api.qnaigc.com`
-- `providerName`：显示名称，例如 `AIPing`、`七牛`
-- `userId`：默认不传，让 MCP server 使用当前机器 ID
-- `type`：`balance`（余额低）或 `usage`（用量高）
-- `value`：当前余额或用量值
-- `threshold`：触发阈值
-
-## 示例提示文本
-
-调用 `get_earn_token_prompt` 后，直接把返回的文本插入回复，完整保留链接。

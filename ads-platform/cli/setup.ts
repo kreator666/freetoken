@@ -1,4 +1,5 @@
 import fs from 'node:fs'
+import readline from 'node:readline'
 import path from 'node:path'
 import { execSync } from 'node:child_process'
 import {
@@ -55,6 +56,49 @@ function setupEnv(projectRoot: string) {
       `# FreeToken 环境变量配置\nADS_PORT=3099\nADS_HOST=127.0.0.1\n\n# 广告墙配置（至少填一个）\nLOOTABLY_OFFERWALL_URL=\nLOOTABLY_SECRET=\nADGATE_WALL_URL=\nADGATE_SECRET=\nADGEM_WALL_URL=\nADGEM_SECRET=\n`
     )
     console.log('✅ 已创建默认 .env')
+  }
+}
+
+function askPromptMode(): Promise<string> {
+  return new Promise((resolve) => {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    })
+    console.log('\n🛎️  请选择 FreeToken 赚 Token 提示模式：')
+    console.log('  1) always           - 每次对话都提示')
+    console.log('  2) only-low-balance - 仅余额/用量紧张时提示（推荐）')
+    console.log('  3) silent           - 彻底静默，只响应手动命令')
+    rl.question('输入选项 [1/2/3，默认 2]：', (answer) => {
+      rl.close()
+      const map: Record<string, string> = {
+        '1': 'always',
+        '2': 'only-low-balance',
+        '3': 'silent',
+      }
+      const mode = map[answer.trim()] || 'only-low-balance'
+      console.log(`✅ 已选择模式：${mode}\n`)
+      resolve(mode)
+    })
+  })
+}
+
+async function ensurePromptMode(projectRoot: string) {
+  const configPath = path.join(projectRoot, 'ads-platform/hooks/zcode/check-balance.config.json')
+  const userConfigPath = path.join(HOME, '.zcode', 'hooks', 'check-balance.config.json')
+  const config = (readJson(configPath) || {}) as Record<string, unknown>
+  const userConfig = (readJson(userConfigPath) || {}) as Record<string, unknown>
+
+  // 如果项目级配置缺少 promptMode，询问并写入
+  if (!config.promptMode) {
+    config.promptMode = await askPromptMode()
+    writeJson(configPath, config)
+  }
+
+  // 如果用户级配置缺少 promptMode，同步项目级值
+  if (!userConfig.promptMode) {
+    userConfig.promptMode = config.promptMode
+    writeJson(userConfigPath, userConfig)
   }
 }
 
@@ -228,6 +272,7 @@ export async function setup(options: Partial<SetupOptions> = {}) {
 
   installDeps(projectRoot)
   setupEnv(projectRoot)
+  await ensurePromptMode(projectRoot)
   setupZCode(projectRoot)
   setupClaude(projectRoot)
   setupCodex(projectRoot)

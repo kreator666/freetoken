@@ -44,3 +44,21 @@ export function buildInlineSnoozePrompt(ctx: PromptContext, minutes = 30): strin
   const snoozeUrl = `${ctx.serverUrl}/api/snooze?user=${encodeURIComponent(ctx.userId)}&provider=${encodeURIComponent(ctx.providerHost)}&minutes=${minutes}`
   return `如果你现在不想看广告，可以稍后提醒：[暂停 ${minutes} 分钟](${snoozeUrl})`
 }
+
+export function buildAlwaysPrompt(ctx: PromptContext): string {
+  const { userId, providerName, providerHost, serverUrl } = ctx
+  const offerwallUrl = `${serverUrl}/offerwall?user=${encodeURIComponent(userId)}&provider=${encodeURIComponent(providerHost)}`
+  const dashboardUrl = `${serverUrl}/dashboard.html?user=${encodeURIComponent(userId)}`
+
+  if (!hasOfferwall()) {
+    return `💡 你可以通过看广告或做任务赚取免费 Token 额度（当前 provider：${providerName}）。
+管理员尚未配置广告墙，赚 Token 功能暂不可用。`
+  }
+
+  return `💡 你可以通过看广告或做任务赚取免费 Token 额度：
+
+🔗 进入任务墙：${offerwallUrl}
+📊 查看积分面板：${dashboardUrl}
+
+完成任务后积分会自动到账，之后在积分面板申请兑换即可。`
+}

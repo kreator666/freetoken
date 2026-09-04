@@ -6,7 +6,7 @@ import { initDb } from './db.js'
 import { PORT, HOST, LOOTABLY_OFFERWALL_URL, ADGATE_WALL_URL, ADGEM_WALL_URL } from './config.js'
 import apiRouter from './routes/api.js'
 import postbackRouter from './routes/postback.js'
-import { buildEarnTokenPrompt } from './prompts.js'
+import { buildEarnTokenPrompt, buildAlwaysPrompt } from './prompts.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -33,21 +33,34 @@ app.get('/api/prompt', (req, res) => {
   const alertType = String(req.query.type || 'balance') as 'balance' | 'usage'
   const value = Number(req.query.value || 0)
   const threshold = Number(req.query.threshold || 0)
+  const mode = String(req.query.mode || 'only-low-balance')
 
   if (!userId || !providerHost) {
     res.status(400).json({ error: 'missing user or provider' })
     return
   }
 
-  const prompt = buildEarnTokenPrompt({
-    userId,
-    providerName,
-    providerHost,
-    alertType,
-    value,
-    threshold,
-    serverUrl: `${req.protocol}://${req.get('host')}`,
-  })
+  const serverUrl = `${req.protocol}://${req.get('host')}`
+  const prompt =
+    mode === 'always'
+      ? buildAlwaysPrompt({
+          userId,
+          providerName,
+          providerHost,
+          alertType,
+          value,
+          threshold,
+          serverUrl,
+        })
+      : buildEarnTokenPrompt({
+          userId,
+          providerName,
+          providerHost,
+          alertType,
+          value,
+          threshold,
+          serverUrl,
+        })
   res.json({ prompt })
 })
 

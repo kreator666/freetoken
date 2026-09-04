@@ -22,6 +22,7 @@ const HOOK_CONFIG_PATH = path.join(HOME, '.zcode', 'hooks', 'check-balance.confi
 // 默认配置
 const DEFAULT_CONFIG = {
   enabled: true,
+  promptMode: 'only-low-balance',
   serverUrl: 'https://freetoken.xin',
   thresholds: {
     'aiping.cn': 10,
@@ -52,12 +53,42 @@ function writeJson(p, data) {
   } catch {}
 }
 
-function loadConfig() {
-  const existing = readJson(HOOK_CONFIG_PATH);
+function askPromptMode() {
+  return new Promise((resolve) => {
+    const readline = require('readline').createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
+    console.error('\n🛎️  请选择 FreeToken 赚 Token 提示模式：');
+    console.error('  1) always           - 每次对话都提示');
+    console.error('  2) only-low-balance - 仅余额/用量紧张时提示（推荐）');
+    console.error('  3) silent           - 彻底静默，只响应手动命令');
+    readline.question('输入选项 [1/2/3，默认 2]：', (answer) => {
+      readline.close();
+      const map = { '1': 'always', '2': 'only-low-balance', '3': 'silent' };
+      const mode = map[answer.trim()] || 'only-low-balance';
+      console.error(`✅ 已选择模式：${mode}\n`);
+      resolve(mode);
+    });
+  });
+}
+
+async function loadConfig() {
+  let existing = readJson(HOOK_CONFIG_PATH);
   if (!existing) {
-    writeJson(HOOK_CONFIG_PATH, DEFAULT_CONFIG);
+    existing = {};
   }
-  return { ...DEFAULT_CONFIG, ...(existing || {}) };
+  if (!existing.promptMode) {
+    if (process.stdin.isTTY) {
+      existing.promptMode = await askPromptMode();
+      writeJson(HOOK_CONFIG_PATH, { ...DEFAULT_CONFIG, ...existing });
+    } else {
+      existing.promptMode = 'only-low-balance';
+      writeJson(HOOK_CONFIG_PATH, { ...DEFAULT_CONFIG, ...existing });
+      writeMarker('配置缺少 promptMode，已默认设置为 only-low-balance，可运行 freetoken setup 修改');
+    }
+  }
+  return { ...DEFAULT_CONFIG, ...existing };
 }
 
 function readZcodeConfig() {
@@ -326,9 +357,15 @@ function writeMarker(message) {
 async function main() {
   writeMarker(`脚本被调用，mode=${MODE}`);
 
-  const config = loadConfig();
+  const config = await loadConfig();
   if (!config.enabled) {
     console.error('[check-balance] hook 已禁用');
+    return;
+  }
+
+  if (config.promptMode === 'silent') {
+    console.error('[check-balance] promptMode 为 silent，跳过提示');
+    writeMarker('silent 模式，跳过提示');
     return;
   }
 
@@ -353,16 +390,35 @@ async function main() {
   const prompts = [];
 
   for (const [id, provider] of entries) {
+    const host = new URL((provider.options.baseURL || '').replace(/\/$/, '')).hostname.toLowerCase();
+    const name = config.providerNames[host] || host;
+
+    if (config.promptMode === 'always') {
+      if (MODE === 'prompt') {
+        const prompt = await fetchPrompt(config, {
+          user: userId,
+          provider: host,
+          name,
+          mode: 'always',
+        });
+        if (prompt) prompts.push(prompt);
+      } else {
+        const offerwallUrl = `${config.serverUrl}/offerwall?user=${encodeURIComponent(userId)}&provider=${encodeURIComponent(host)}`;
+        console.error(`🔔 打开任务墙: ${offerwallUrl}`);
+        openBrowser(offerwallUrl);
+      }
+      continue;
+    }
+
     const result = await checkProvider(id, provider, config);
     const prefix = result.ok ? '✅' : '⚠️';
     console.error(`${prefix} ${result.message}`);
 
     if (!result.ok || !result.alert) continue;
 
-    const host = new URL((provider.options.baseURL || '').replace(/\/$/, '')).hostname.toLowerCase();
     const snoozed = await isSnoozed(config, userId, host);
     if (snoozed) {
-      console.error(`⏰ ${config.providerNames[host] || host} 已被用户设置 snooze，跳过提示`);
+      console.error(`⏰ ${name} 已被用户设置 snooze，跳过提示`);
       continue;
     }
 
@@ -371,7 +427,6 @@ async function main() {
     const value = typeof rawValue === 'number' ? rawValue : 0;
     const rawThreshold = result.threshold ?? config.thresholds[host] ?? config.usageThresholds[host] ?? '未知';
     const threshold = typeof rawThreshold === 'number' ? rawThreshold : 0;
-    const name = config.providerNames[host] || host;
 
     if (MODE === 'prompt') {
       const prompt = await fetchPrompt(config, {

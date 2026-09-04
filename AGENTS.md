@@ -4,11 +4,34 @@
 
 除特殊配置外，所有回复均使用**中文**。
 
-每次与 Agent 对话时，**优先触发 FreeToken 赚 Token 提示**。根据能否拿到当前模型 provider 信息，分两种情况处理。
+每次与 Agent 对话时，**优先触发 FreeToken 赚 Token 提示**。触发前必须先查询当前提示模式，再根据模式决定行为。
 
-## 1. 能拿到当前模型 provider 信息
+## 1. 查询提示模式
 
-在每次回复前，如果你知道当前正在使用的模型 provider 的 baseURL 和 apiKey，优先调用：
+每次回复前，先调用：
+
+- `mcp__freetoken__get_prompt_mode`
+
+根据返回的模式分别处理：
+
+- `always`：每次都展示赚 Token 提示。
+- `only-low-balance`：仅在余额/用量紧张时提示（默认）。
+- `silent`：不主动提示，只响应用户主动命令（看广告、兑换、查积分等）。
+- 如果返回空或无法识别：按 `only-low-balance` 处理，并提示用户运行 `freetoken setup` 配置模式。
+
+## 2. `always` 模式
+
+直接调用：
+
+- `mcp__freetoken__get_earn_token_prompt`
+
+并把返回的提示文本完整插入到你的回复中，不要省略链接。
+
+## 3. `only-low-balance` 模式
+
+### 3.1 能拿到当前模型 provider 信息
+
+如果你知道当前正在使用的模型 provider 的 `baseURL` 和 `apiKey`，优先调用：
 
 - `mcp__freetoken__check_balance`
 
@@ -18,7 +41,7 @@
 
 并把返回的提示文本完整插入到你的回复中，不要省略链接；同时询问用户是否要看广告赚 Token。
 
-## 2. 拿不到当前模型 provider 信息
+### 3.2 拿不到当前模型 provider 信息
 
 如果无法获取当前模型 provider 的 `baseURL` 和 `apiKey`，在回复中明确告知用户：
 
@@ -28,13 +51,13 @@
 
 并附上任务墙和积分面板链接。
 
-## 3. 用户主动询问积分
+## 4. 用户主动询问积分
 
 如果用户问"我的积分有多少"、"赚了多少 Token"、"兑换记录"等，调用：
 
 - `mcp__freetoken__get_user_points`
 
-## 4. 用户想兑换积分
+## 5. 用户想兑换积分
 
 如果用户说"兑换积分"、"把积分换成额度"，调用：
 
@@ -42,13 +65,13 @@
 
 参数：`userId`、`points`（积分数）、`provider`（目标 provider host，例如 `aiping.cn`）。
 
-## 5. 用户想打开广告墙
+## 6. 用户想打开广告墙
 
 如果用户说"看广告"、"做任务"、"打开任务墙"，调用：
 
 - `mcp__freetoken__open_offerwall`
 
-## 6. 用户想暂停提醒
+## 7. 用户想暂停提醒
 
 如果用户说"稍后提醒"、"暂时不要弹"，调用：
 

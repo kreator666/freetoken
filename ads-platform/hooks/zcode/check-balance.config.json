@@ -1,5 +1,6 @@
 {
   "enabled": true,
+  "promptMode": "only-low-balance",
   "serverUrl": "https://freetoken.xin",
   "thresholds": {
     "aiping.cn": 10,
