@@ -4,17 +4,162 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FreeToken — 看广告赚 AI Token 额度</title>
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('freetoken-theme');
+        if (t) document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9182114044842801"
      crossorigin="anonymous"></script>
   <script src="https://pl31183945.profitableratecpmnetwork.com/c0/9e/21/c09e210761f6d1974093f563355cbd9b.js"></script>
   <script src="https://pl31183946.profitableratecpmnetwork.com/bb/c5/b7/bbc5b73ec72e2240a8502f5c5e8d4d49.js"></script>
   <style>
-    :root {
-      --matrix-green: #00ff41;
-      --matrix-dark: #003b00;
-      --matrix-glow: rgba(0, 255, 65, 0.6);
+    :root, html[data-theme="matrix"] {
       --bg: #050505;
       --panel: rgba(0, 20, 0, 0.75);
+      --accent: #00ff41;
+      --accent-hover: #00cc33;
+      --accent2: #00ff41;
+      --on-accent: #000000;
+      --glow: rgba(0, 255, 65, 0.6);
+      --glow-card: rgba(0, 255, 65, 0.1);
+      --glow-inset: rgba(0, 255, 65, 0.03);
+      --glow-btn: rgba(0, 255, 65, 0.3);
+      --feature-bg: rgba(0, 255, 65, 0.05);
+      --ad-border: rgba(0, 255, 65, 0.25);
+      --text: #00ff41;
+      --text-dim: #00cc33;
+      --text-soft: #b3ffb3;
+      --text-faint: #005500;
+      --text-fainter: #003300;
+      --placeholder: #008800;
+      --footer-text: #006600;
+      --code-bg: #001100;
+      --code-text: #00ff41;
+      --border-dim: #004400;
+      --input-bg: #001100;
+      --font-body: 'Courier New', Courier, monospace;
+      --font-display: 'Courier New', Courier, monospace;
+      --canvas-opacity: 0.35;
+    }
+
+    html[data-theme="synth"] {
+      --bg: #0d0221;
+      --panel: rgba(20, 4, 45, 0.78);
+      --accent: #00e5ff;
+      --accent-hover: #00b8d4;
+      --accent2: #ff2975;
+      --on-accent: #02121a;
+      --glow: rgba(0, 229, 255, 0.55);
+      --glow-card: rgba(255, 41, 117, 0.12);
+      --glow-inset: rgba(0, 229, 255, 0.04);
+      --glow-btn: rgba(0, 229, 255, 0.35);
+      --feature-bg: rgba(0, 229, 255, 0.06);
+      --ad-border: rgba(255, 41, 117, 0.35);
+      --text: #d9f6ff;
+      --text-dim: #8fd8ea;
+      --text-soft: #bfeffb;
+      --text-faint: #6b4a8f;
+      --text-fainter: #3d2b5c;
+      --placeholder: #4d7a8a;
+      --footer-text: #5c4a7a;
+      --code-bg: #12042b;
+      --code-text: #00e5ff;
+      --border-dim: #3a1560;
+      --input-bg: #150635;
+      --font-body: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      --font-display: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      --canvas-opacity: 0.55;
+    }
+
+    html[data-theme="aurora"] {
+      --bg: #070b1a;
+      --panel: rgba(13, 20, 44, 0.7);
+      --accent: #64ffda;
+      --accent-hover: #4adbbd;
+      --accent2: #8ea2ff;
+      --on-accent: #04231c;
+      --glow: rgba(100, 255, 218, 0.5);
+      --glow-card: rgba(142, 162, 255, 0.12);
+      --glow-inset: rgba(100, 255, 218, 0.04);
+      --glow-btn: rgba(100, 255, 218, 0.3);
+      --feature-bg: rgba(100, 255, 218, 0.06);
+      --ad-border: rgba(142, 162, 255, 0.3);
+      --text: #e6ecff;
+      --text-dim: #9fb2e8;
+      --text-soft: #c6d2f2;
+      --text-faint: #4a5a8a;
+      --text-fainter: #2c3860;
+      --placeholder: #3f4f7d;
+      --footer-text: #46568a;
+      --code-bg: #0a1024;
+      --code-text: #64ffda;
+      --border-dim: #1e2a52;
+      --input-bg: #0b1228;
+      --font-body: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      --font-display: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      --canvas-opacity: 0.65;
+    }
+
+    html[data-theme="paper"] {
+      --bg: #f7f4ee;
+      --panel: rgba(255, 255, 255, 0.85);
+      --accent: #9a4a1f;
+      --accent-hover: #833c17;
+      --accent2: #d97706;
+      --on-accent: #fff8f0;
+      --glow: rgba(154, 74, 31, 0.25);
+      --glow-card: rgba(60, 45, 30, 0.08);
+      --glow-inset: rgba(60, 45, 30, 0.02);
+      --glow-btn: rgba(154, 74, 31, 0.25);
+      --feature-bg: rgba(154, 74, 31, 0.06);
+      --ad-border: rgba(154, 74, 31, 0.25);
+      --text: #26221c;
+      --text-dim: #6b5d4f;
+      --text-soft: #4a4238;
+      --text-faint: #a39a8c;
+      --text-fainter: #c9c2b6;
+      --placeholder: #b3a895;
+      --footer-text: #9a8f7d;
+      --code-bg: #f0ebe1;
+      --code-text: #7a3b14;
+      --border-dim: #ddd5c7;
+      --input-bg: #fffdf9;
+      --font-body: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      --font-display: Georgia, 'Times New Roman', 'Songti SC', serif;
+      --canvas-opacity: 0.6;
+    }
+
+    html[data-theme="noir"] {
+      --bg: #0b0a08;
+      --panel: rgba(24, 20, 12, 0.78);
+      --accent: #d4af37;
+      --accent-hover: #b8962e;
+      --accent2: #f0d878;
+      --on-accent: #1a1405;
+      --glow: rgba(212, 175, 55, 0.5);
+      --glow-card: rgba(212, 175, 55, 0.1);
+      --glow-inset: rgba(212, 175, 55, 0.03);
+      --glow-btn: rgba(212, 175, 55, 0.3);
+      --feature-bg: rgba(212, 175, 55, 0.06);
+      --ad-border: rgba(212, 175, 55, 0.3);
+      --text: #e9dfc8;
+      --text-dim: #b3a377;
+      --text-soft: #d8cba6;
+      --text-faint: #6e6244;
+      --text-fainter: #3f3826;
+      --placeholder: #6e6244;
+      --footer-text: #6e6244;
+      --code-bg: #14110a;
+      --code-text: #e6c860;
+      --border-dim: #33291a;
+      --input-bg: #16130b;
+      --font-body: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      --font-display: Georgia, 'Times New Roman', 'Songti SC', serif;
+      --canvas-opacity: 0.5;
     }
 
     * {
@@ -25,22 +170,58 @@
 
     body {
       background: var(--bg);
-      color: var(--matrix-green);
-      font-family: 'Courier New', Courier, monospace;
+      color: var(--text);
+      font-family: var(--font-body);
       min-height: 100vh;
       overflow-x: hidden;
       position: relative;
+      transition: background 0.4s ease, color 0.4s ease;
     }
 
-    #matrix-canvas {
+    #bg-canvas {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       z-index: 0;
-      opacity: 0.35;
+      opacity: var(--canvas-opacity);
       pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .theme-switcher {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 10;
+      display: flex;
+      gap: 10px;
+      padding: 8px 12px;
+      background: var(--panel);
+      border: 1px solid var(--border-dim);
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 12px var(--glow-inset);
+    }
+
+    .swatch {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      padding: 0;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .swatch:hover {
+      transform: scale(1.2);
+    }
+
+    .swatch.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 10px var(--glow);
     }
 
     .container {
@@ -57,28 +238,30 @@
     }
 
     .hero h1 {
+      font-family: var(--font-display);
       font-size: clamp(2.5rem, 8vw, 5rem);
       letter-spacing: 0.05em;
-      text-shadow: 0 0 10px var(--matrix-glow), 0 0 30px var(--matrix-glow);
+      text-shadow: 0 0 10px var(--glow), 0 0 30px var(--glow);
       margin-bottom: 16px;
       font-weight: 700;
     }
 
     .hero .subtitle {
       font-size: 1.1rem;
-      color: #00cc33;
+      color: var(--text-dim);
       opacity: 0.9;
       min-height: 1.5em;
     }
 
     .card {
       background: var(--panel);
-      border: 1px solid var(--matrix-green);
+      border: 1px solid var(--accent);
       border-radius: 12px;
       padding: 32px;
       margin-bottom: 40px;
-      box-shadow: 0 0 20px rgba(0, 255, 65, 0.1), inset 0 0 30px rgba(0, 255, 65, 0.03);
+      box-shadow: 0 0 20px var(--glow-card), inset 0 0 30px var(--glow-inset);
       backdrop-filter: blur(6px);
+      transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
     }
 
     .card h2 {
@@ -91,14 +274,14 @@
 
     .card h2::before {
       content: '>';
-      color: var(--matrix-green);
-      text-shadow: 0 0 8px var(--matrix-glow);
+      color: var(--accent);
+      text-shadow: 0 0 8px var(--glow);
     }
 
     .card p {
       line-height: 1.8;
       margin-bottom: 16px;
-      color: #b3ffb3;
+      color: var(--text-soft);
     }
 
     .feature-list {
@@ -111,22 +294,23 @@
 
     .feature-list li {
       padding: 12px 16px;
-      border-left: 3px solid var(--matrix-green);
-      background: rgba(0, 255, 65, 0.05);
+      border-left: 3px solid var(--accent);
+      background: var(--feature-bg);
     }
 
     .code-block {
-      background: #001100;
-      border: 1px solid #004400;
+      background: var(--code-bg);
+      border: 1px solid var(--border-dim);
       border-radius: 8px;
       padding: 18px;
       position: relative;
       overflow-x: auto;
       margin-bottom: 16px;
+      transition: background 0.4s ease, border-color 0.4s ease;
     }
 
     .code-block pre {
-      color: #00ff41;
+      color: var(--code-text);
       font-family: 'Courier New', Courier, monospace;
       font-size: 0.9rem;
       line-height: 1.6;
@@ -139,8 +323,8 @@
       top: 10px;
       right: 10px;
       background: transparent;
-      border: 1px solid var(--matrix-green);
-      color: var(--matrix-green);
+      border: 1px solid var(--accent);
+      color: var(--accent);
       padding: 6px 12px;
       border-radius: 4px;
       cursor: pointer;
@@ -150,19 +334,19 @@
     }
 
     .copy-btn:hover {
-      background: var(--matrix-green);
-      color: #000;
+      background: var(--accent);
+      color: var(--on-accent);
     }
 
     .copy-btn.copied {
-      background: var(--matrix-green);
-      color: #000;
+      background: var(--accent);
+      color: var(--on-accent);
     }
 
     .enter-section {
       text-align: center;
       padding-top: 40px;
-      border-top: 1px dashed #004400;
+      border-top: 1px dashed var(--border-dim);
     }
 
     .enter-section h2 {
@@ -182,28 +366,29 @@
     .input-group input {
       flex: 1;
       min-width: 220px;
-      background: #001100;
-      border: 1px solid var(--matrix-green);
-      color: var(--matrix-green);
+      background: var(--input-bg);
+      border: 1px solid var(--accent);
+      color: var(--text);
       padding: 14px 18px;
       border-radius: 8px;
       font-family: inherit;
       font-size: 1rem;
       outline: none;
-      box-shadow: 0 0 10px rgba(0, 255, 65, 0.1);
+      box-shadow: 0 0 10px var(--glow-card);
+      transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.2s ease;
     }
 
     .input-group input::placeholder {
-      color: #008800;
+      color: var(--placeholder);
     }
 
     .input-group input:focus {
-      box-shadow: 0 0 20px var(--matrix-glow);
+      box-shadow: 0 0 20px var(--glow);
     }
 
     .input-group button {
-      background: var(--matrix-green);
-      color: #000;
+      background: var(--accent);
+      color: var(--on-accent);
       border: none;
       padding: 14px 28px;
       border-radius: 8px;
@@ -212,18 +397,18 @@
       font-weight: 700;
       cursor: pointer;
       transition: all 0.2s;
-      box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+      box-shadow: 0 0 15px var(--glow-btn);
     }
 
     .input-group button:hover {
-      background: #00cc33;
-      box-shadow: 0 0 25px var(--matrix-glow);
+      background: var(--accent-hover);
+      box-shadow: 0 0 25px var(--glow);
     }
 
     .footer {
       text-align: center;
       margin-top: 60px;
-      color: #006600;
+      color: var(--footer-text);
       font-size: 0.85rem;
     }
 
@@ -237,11 +422,11 @@
 
     .ad-card {
       background: var(--panel);
-      border: 1px solid rgba(0, 255, 65, 0.25);
+      border: 1px solid var(--ad-border);
       border-radius: 12px;
       padding: 24px 32px;
       margin-bottom: 40px;
-      box-shadow: 0 0 12px rgba(0, 255, 65, 0.06), inset 0 0 20px rgba(0, 255, 65, 0.02);
+      box-shadow: 0 0 12px var(--glow-card), inset 0 0 20px var(--glow-inset);
       backdrop-filter: blur(6px);
       text-align: center;
       min-height: 120px;
@@ -250,6 +435,7 @@
       justify-content: center;
       position: relative;
       overflow: hidden;
+      transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
     }
 
     .ad-card::before {
@@ -259,7 +445,7 @@
       left: 0;
       right: 0;
       height: 1px;
-      background: linear-gradient(90deg, transparent, var(--matrix-green), transparent);
+      background: linear-gradient(90deg, transparent, var(--accent2), transparent);
       opacity: 0.4;
     }
 
@@ -268,13 +454,13 @@
       top: 8px;
       right: 12px;
       font-size: 0.65rem;
-      color: #005500;
+      color: var(--text-faint);
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
     .ad-card .ad-placeholder {
-      color: #003300;
+      color: var(--text-fainter);
       font-size: 0.9rem;
       padding: 20px;
     }
@@ -298,11 +484,23 @@
         padding: 18px 16px;
         min-height: 100px;
       }
+      .theme-switcher {
+        top: 10px;
+        right: 10px;
+        gap: 8px;
+        padding: 6px 10px;
+      }
+      .swatch {
+        width: 18px;
+        height: 18px;
+      }
     }
   </style>
 </head>
 <body>
-  <canvas id="matrix-canvas"></canvas>
+  <canvas id="bg-canvas"></canvas>
+
+  <div class="theme-switcher" id="theme-switcher" aria-label="切换主题"></div>
 
   <div class="container">
     <header class="hero">
@@ -328,7 +526,7 @@
 
     <section class="card">
       <h2>安装 MCP Server</h2>
-      <h3 style="color: #00cc33; margin: 20px 0 10px; font-size: 1.1rem;">方式一：远程一键安装（推荐）</h3>
+      <h3 style="color: var(--text-dim); margin: 20px 0 10px; font-size: 1.1rem;">方式一：远程一键安装（推荐）</h3>
       <p>不需要先下载代码，一条命令自动完成下载、安装依赖、配置 Agent：</p>
       <div class="code-block">
         <button class="copy-btn" onclick="copyCode(this)">复制</button>
@@ -340,7 +538,7 @@
         <pre>(Invoke-WebRequest -Uri https://raw.githubusercontent.com/kreator666/freetoken/main/install.js -UseBasicParsing).Content | node -</pre>
       </div>
 
-      <h3 style="color: #00cc33; margin: 40px 0 10px; font-size: 1.1rem;">方式二：已有代码配置</h3>
+      <h3 style="color: var(--text-dim); margin: 40px 0 10px; font-size: 1.1rem;">方式二：已有代码配置</h3>
       <p>如果已经下载了 freetoken 代码，在项目目录内运行：</p>
       <div class="code-block">
         <button class="copy-btn" onclick="copyCode(this)">复制</button>
@@ -437,41 +635,236 @@ node bin/freetoken.cjs setup</pre>
       });
     }
 
-    // Matrix rain
-    const canvas = document.getElementById('matrix-canvas');
+    // ---- 主题系统 ----
+    const THEMES = {
+      matrix: { name: '黑客帝国', mode: 'matrix', swatch: 'linear-gradient(135deg, #003b00 0%, #00ff41 100%)' },
+      synth:  { name: '赛博朋克', mode: 'grid',   swatch: 'linear-gradient(135deg, #ff2975 0%, #00e5ff 100%)' },
+      aurora: { name: '极光夜幕', mode: 'aurora', swatch: 'linear-gradient(135deg, #0b1026 0%, #64ffda 60%, #8ea2ff 100%)' },
+      paper:  { name: '纸间素白', mode: 'bokeh',  swatch: 'linear-gradient(135deg, #f7f4ee 55%, #9a4a1f 100%)' },
+      noir:   { name: '暗夜流金', mode: 'embers', swatch: 'linear-gradient(135deg, #0b0a08 20%, #d4af37 100%)' }
+    };
+
+    let currentTheme = document.documentElement.getAttribute('data-theme') || 'matrix';
+    if (!THEMES[currentTheme]) currentTheme = 'matrix';
+
+    const switcher = document.getElementById('theme-switcher');
+    Object.entries(THEMES).forEach(([key, theme]) => {
+      const btn = document.createElement('button');
+      btn.className = 'swatch';
+      btn.dataset.theme = key;
+      btn.title = theme.name;
+      btn.setAttribute('aria-label', '切换到主题：' + theme.name);
+      btn.style.background = theme.swatch;
+      btn.addEventListener('click', () => setTheme(key));
+      switcher.appendChild(btn);
+    });
+
+    // ---- 背景动画引擎 ----
+    const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
     let width, height;
-    const fontSize = 14;
-    let columns;
-    let drops = [];
-    const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+    let currentMode = 'matrix';
+    let modeState = {};
 
     function resize() {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
-      columns = Math.floor(width / fontSize);
-      drops = Array(columns).fill(1);
     }
     resize();
     window.addEventListener('resize', resize);
 
-    function drawMatrix() {
+    const matrixChars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+
+    function renderMatrix() {
+      const fontSize = 14;
+      const columns = Math.ceil(width / fontSize);
+      if (!modeState.drops || modeState.drops.length !== columns) {
+        modeState.drops = Array(columns).fill(1);
+      }
+      const drops = modeState.drops;
+
       ctx.fillStyle = 'rgba(5, 5, 5, 0.05)';
       ctx.fillRect(0, 0, width, height);
       ctx.fillStyle = '#00ff41';
       ctx.font = fontSize + 'px monospace';
 
       for (let i = 0; i < drops.length; i++) {
-        const text = chars[Math.floor(Math.random() * chars.length)];
+        const text = matrixChars[Math.floor(Math.random() * matrixChars.length)];
         ctx.fillText(text, i * fontSize, drops[i] * fontSize);
         if (drops[i] * fontSize > height && Math.random() > 0.975) {
           drops[i] = 0;
         }
         drops[i]++;
       }
-      requestAnimationFrame(drawMatrix);
     }
-    drawMatrix();
+
+    function renderGrid(t) {
+      ctx.fillStyle = 'rgba(13, 2, 33, 0.35)';
+      ctx.fillRect(0, 0, width, height);
+
+      const cx = width / 2;
+      const horizon = height * 0.55;
+
+      if (!modeState.stars) {
+        modeState.stars = Array.from({ length: 120 }, () => ({
+          x: Math.random(),
+          y: Math.random() * 0.5,
+          r: Math.random() * 1.4 + 0.3,
+          tw: Math.random() * Math.PI * 2
+        }));
+      }
+      ctx.fillStyle = '#ffffff';
+      for (const s of modeState.stars) {
+        ctx.globalAlpha = 0.2 + 0.6 * Math.abs(Math.sin(t / 900 + s.tw));
+        ctx.beginPath();
+        ctx.arc(s.x * width, s.y * height, s.r, 0, 7);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+
+      const spread = width / 14;
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(255, 41, 117, 0.55)';
+      for (let i = -14; i <= 14; i++) {
+        ctx.beginPath();
+        ctx.moveTo(cx + i * spread * 0.06, horizon);
+        ctx.lineTo(cx + i * spread * 1.6, height);
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = 'rgba(0, 229, 255, 0.5)';
+      const offset = (t / 2500) % 1;
+      for (let i = 0; i < 14; i++) {
+        const p = (i / 14 + offset) % 1;
+        const y = horizon + (height - horizon) * Math.pow(p, 2.4);
+        ctx.globalAlpha = Math.min(1, p * 2);
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+
+      ctx.strokeStyle = 'rgba(255, 41, 117, 0.9)';
+      ctx.beginPath();
+      ctx.moveTo(0, horizon);
+      ctx.lineTo(width, horizon);
+      ctx.stroke();
+    }
+
+    const auroraBlobs = [
+      { c: 'rgba(100, 255, 218, 0.16)', r: 0.55, sx: 0.25, sy: 0.3, ax: 0.18, ay: 0.12, sp: 0.00021, ph: 0 },
+      { c: 'rgba(142, 162, 255, 0.16)', r: 0.5,  sx: 0.7,  sy: 0.25, ax: 0.15, ay: 0.15, sp: 0.00017, ph: 2 },
+      { c: 'rgba(179, 136, 255, 0.14)', r: 0.45, sx: 0.45, sy: 0.6,  ax: 0.2,  ay: 0.1,  sp: 0.00025, ph: 4 },
+      { c: 'rgba(100, 255, 218, 0.1)',  r: 0.4,  sx: 0.85, sy: 0.7,  ax: 0.12, ay: 0.12, sp: 0.00019, ph: 1 }
+    ];
+
+    function renderAurora(t) {
+      ctx.fillStyle = '#070b1a';
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.globalCompositeOperation = 'lighter';
+      for (const b of auroraBlobs) {
+        const x = (b.sx + Math.sin(t * b.sp + b.ph) * b.ax) * width;
+        const y = (b.sy + Math.cos(t * b.sp * 1.2 + b.ph) * b.ay) * height;
+        const r = b.r * Math.max(width, height) * 0.6;
+        const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+        g.addColorStop(0, b.c);
+        g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = g;
+        ctx.fillRect(x - r, y - r, r * 2, r * 2);
+      }
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    function renderBokeh() {
+      ctx.fillStyle = 'rgba(247, 244, 238, 0.08)';
+      ctx.fillRect(0, 0, width, height);
+
+      if (!modeState.parts) {
+        modeState.parts = Array.from({ length: 36 }, () => ({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          r: Math.random() * 28 + 8,
+          vx: (Math.random() - 0.5) * 0.15,
+          vy: (Math.random() - 0.5) * 0.15,
+          c: Math.random() > 0.7 ? 'rgba(154, 74, 31, 0.05)' : 'rgba(60, 50, 35, 0.04)'
+        }));
+      }
+      for (const p of modeState.parts) {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < -p.r) p.x = width + p.r;
+        if (p.x > width + p.r) p.x = -p.r;
+        if (p.y < -p.r) p.y = height + p.r;
+        if (p.y > height + p.r) p.y = -p.r;
+        ctx.fillStyle = p.c;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, 7);
+        ctx.fill();
+      }
+    }
+
+    function renderEmbers() {
+      ctx.fillStyle = 'rgba(11, 10, 8, 0.14)';
+      ctx.fillRect(0, 0, width, height);
+
+      if (!modeState.parts) modeState.parts = [];
+      const parts = modeState.parts;
+      if (parts.length < 70 && Math.random() > 0.4) {
+        parts.push({
+          x: Math.random() * width,
+          y: height + 10,
+          r: Math.random() * 2.2 + 0.6,
+          v: Math.random() * 0.8 + 0.3,
+          sway: Math.random() * Math.PI * 2,
+          a: Math.random() * 0.5 + 0.2
+        });
+      }
+      ctx.fillStyle = '#e6c860';
+      for (let i = parts.length - 1; i >= 0; i--) {
+        const p = parts[i];
+        p.y -= p.v;
+        p.x += Math.sin(p.y * 0.01 + p.sway) * 0.4;
+        if (p.y < -10) {
+          parts.splice(i, 1);
+          continue;
+        }
+        ctx.globalAlpha = p.a * (0.4 + 0.6 * Math.abs(Math.sin(p.y * 0.02)));
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, 7);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    const RENDERERS = {
+      matrix: renderMatrix,
+      grid: renderGrid,
+      aurora: renderAurora,
+      bokeh: renderBokeh,
+      embers: renderEmbers
+    };
+
+    function tick(t) {
+      (RENDERERS[currentMode] || renderMatrix)(t);
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    function setTheme(name) {
+      if (!THEMES[name]) return;
+      currentTheme = name;
+      document.documentElement.setAttribute('data-theme', name);
+      try { localStorage.setItem('freetoken-theme', name); } catch (e) {}
+      currentMode = THEMES[name].mode;
+      modeState = {};
+      document.querySelectorAll('.swatch').forEach((b) => {
+        b.classList.toggle('active', b.dataset.theme === name);
+      });
+    }
+
+    setTheme(currentTheme);
 
     // Google AdSense
     (adsbygoogle = window.adsbygoogle || []).push({});
