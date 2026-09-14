@@ -175,6 +175,7 @@
       min-height: 100vh;
       overflow-x: hidden;
       position: relative;
+      padding-top: 64px;
       transition: background 0.4s ease, color 0.4s ease;
     }
 
@@ -190,24 +191,98 @@
       transition: opacity 0.4s ease;
     }
 
-    .theme-switcher {
+    /* ---- 顶部窄导航栏 ---- */
+    .navbar {
       position: fixed;
-      top: 16px;
-      right: 16px;
-      z-index: 10;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
       display: flex;
-      gap: 10px;
-      padding: 8px 12px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px 20px;
       background: var(--panel);
+      border-bottom: 1px solid var(--border-dim);
+      backdrop-filter: blur(10px);
+      transition: background 0.4s ease, border-color 0.4s ease;
+    }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 1.15rem;
+      font-weight: 700;
+      text-shadow: 0 0 8px var(--glow);
+      white-space: nowrap;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav-login {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-login input {
+      background: var(--input-bg);
       border: 1px solid var(--border-dim);
+      color: var(--text);
+      padding: 8px 14px;
       border-radius: 999px;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 0 12px var(--glow-inset);
+      width: 190px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .nav-login input::placeholder {
+      color: var(--placeholder);
+    }
+
+    .nav-login input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 12px var(--glow-btn);
+    }
+
+    .nav-login button {
+      background: var(--accent);
+      color: var(--on-accent);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 0 10px var(--glow-btn);
+      transition: all 0.2s;
+    }
+
+    .nav-login button:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 0 18px var(--glow);
+    }
+
+    .nav-themes {
+      display: flex;
+      gap: 8px;
+      align-items: center;
     }
 
     .swatch {
-      width: 22px;
-      height: 22px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
       border: 2px solid transparent;
       cursor: pointer;
@@ -229,20 +304,20 @@
       z-index: 1;
       max-width: 960px;
       margin: 0 auto;
-      padding: 60px 20px;
+      padding: 40px 20px 60px;
     }
 
     .hero {
       text-align: center;
-      margin-bottom: 80px;
+      margin-bottom: 48px;
     }
 
     .hero h1 {
       font-family: var(--font-display);
-      font-size: clamp(2.5rem, 8vw, 5rem);
+      font-size: clamp(2.2rem, 7vw, 4rem);
       letter-spacing: 0.05em;
       text-shadow: 0 0 10px var(--glow), 0 0 30px var(--glow);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       font-weight: 700;
     }
 
@@ -343,66 +418,198 @@
       color: var(--on-accent);
     }
 
-    .enter-section {
-      text-align: center;
-      padding-top: 40px;
-      border-top: 1px dashed var(--border-dim);
+    /* ---- 轮播 ---- */
+    .carousel {
+      position: relative;
+      overflow: hidden;
+      padding-bottom: 60px;
     }
 
-    .enter-section h2 {
-      justify-content: center;
-      margin-bottom: 24px;
-    }
-
-    .input-group {
+    .carousel-track {
       display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      justify-content: center;
-      max-width: 500px;
-      margin: 0 auto;
+      align-items: stretch;
+      transition: transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
     }
 
-    .input-group input {
-      flex: 1;
-      min-width: 220px;
-      background: var(--input-bg);
-      border: 1px solid var(--accent);
-      color: var(--text);
-      padding: 14px 18px;
-      border-radius: 8px;
-      font-family: inherit;
-      font-size: 1rem;
-      outline: none;
-      box-shadow: 0 0 10px var(--glow-card);
-      transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.2s ease;
+    .slide {
+      min-width: 100%;
+      padding: 0 48px;
     }
 
-    .input-group input::placeholder {
-      color: var(--placeholder);
-    }
-
-    .input-group input:focus {
-      box-shadow: 0 0 20px var(--glow);
-    }
-
-    .input-group button {
-      background: var(--accent);
-      color: var(--on-accent);
-      border: none;
-      padding: 14px 28px;
-      border-radius: 8px;
-      font-family: inherit;
-      font-size: 1rem;
-      font-weight: 700;
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-65%);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--border-dim);
+      background: var(--panel);
+      color: var(--accent);
       cursor: pointer;
+      font-size: 1.2rem;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       transition: all 0.2s;
-      box-shadow: 0 0 15px var(--glow-btn);
+      z-index: 2;
+      font-family: inherit;
     }
 
-    .input-group button:hover {
-      background: var(--accent-hover);
-      box-shadow: 0 0 25px var(--glow);
+    .carousel-btn:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 12px var(--glow-btn);
+    }
+
+    .carousel-btn.prev { left: 8px; }
+    .carousel-btn.next { right: 8px; }
+
+    .carousel-dots {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border-dim);
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      transition: all 0.25s;
+    }
+
+    .dot.active {
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--glow);
+      transform: scale(1.3);
+    }
+
+    /* ---- 随机发现卡片 ---- */
+    .discovery {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 40px;
+      border: 1px solid var(--ad-border);
+      background: var(--panel);
+      box-shadow: 0 0 12px var(--glow-card), inset 0 0 20px var(--glow-inset);
+      backdrop-filter: blur(6px);
+      min-height: 240px;
+      transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .discovery .badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      z-index: 3;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.45);
+      color: #fff;
+      backdrop-filter: blur(4px);
+      text-transform: uppercase;
+    }
+
+    .discovery-refresh {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 3;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      background: rgba(0, 0, 0, 0.35);
+      color: #fff;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      transition: transform 0.3s ease, box-shadow 0.2s ease;
+    }
+
+    .discovery-refresh:hover {
+      transform: rotate(180deg);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.35);
+    }
+
+    .discovery-photo {
+      position: relative;
+      line-height: 0;
+    }
+
+    .discovery-photo img {
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .discovery-photo::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 45%, rgba(0, 0, 0, 0.78));
+    }
+
+    .photo-caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 22px 28px;
+      color: #fff;
+      z-index: 1;
+      line-height: 1.5;
+    }
+
+    .photo-caption h3 {
+      font-size: 1.3rem;
+      margin-bottom: 6px;
+      letter-spacing: 0.04em;
+    }
+
+    .photo-caption p {
+      font-size: 0.9rem;
+      opacity: 0.85;
+    }
+
+    .discovery-ai {
+      text-align: center;
+      padding: 52px 32px 44px;
+    }
+
+    .discovery-ai .ai-icon {
+      font-size: 2.6rem;
+      margin-bottom: 14px;
+      filter: drop-shadow(0 0 12px var(--glow));
+    }
+
+    .discovery-ai h3 {
+      color: var(--accent);
+      font-size: 1.35rem;
+      margin-bottom: 12px;
+      text-shadow: 0 0 10px var(--glow-btn);
+    }
+
+    .discovery-ai p {
+      color: var(--text-soft);
+      line-height: 1.9;
+      max-width: 620px;
+      margin: 0 auto;
     }
 
     .footer {
@@ -474,8 +681,33 @@
     }
 
     @media (max-width: 600px) {
+      body {
+        padding-top: 104px;
+      }
+      .navbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 10px 14px;
+      }
+      .nav-logo {
+        text-align: center;
+      }
+      .nav-actions {
+        justify-content: center;
+      }
+      .nav-login input {
+        width: 130px;
+        flex: 1;
+      }
       .card {
         padding: 22px;
+      }
+      .slide {
+        padding: 0 10px;
+      }
+      .carousel-btn {
+        display: none;
       }
       .feature-list {
         grid-template-columns: 1fr;
@@ -484,15 +716,8 @@
         padding: 18px 16px;
         min-height: 100px;
       }
-      .theme-switcher {
-        top: 10px;
-        right: 10px;
-        gap: 8px;
-        padding: 6px 10px;
-      }
-      .swatch {
-        width: 18px;
-        height: 18px;
+      .discovery-photo img {
+        height: 220px;
       }
     }
   </style>
@@ -500,7 +725,16 @@
 <body>
   <canvas id="bg-canvas"></canvas>
 
-  <div class="theme-switcher" id="theme-switcher" aria-label="切换主题"></div>
+  <nav class="navbar">
+    <a class="nav-logo" href="/">FreeToken<span class="blink">_</span></a>
+    <div class="nav-actions">
+      <div class="nav-login">
+        <input id="user" type="text" placeholder="用户 ID，例如 user-123">
+        <button onclick="enter()">进入任务墙</button>
+      </div>
+      <div class="nav-themes" id="theme-switcher" aria-label="切换主题"></div>
+    </div>
+  </nav>
 
   <div class="container">
     <header class="hero">
@@ -508,47 +742,56 @@
       <p class="subtitle" id="typewriter"></p>
     </header>
 
-    <section class="card">
-      <h2>项目介绍</h2>
-      <p>
-        FreeToken 是一个面向 ZCode、Claude Code、Codex、Cursor 等 AI Agent 的广告变现平台。
-        当 Agent 检测到模型 provider 余额不足或 token 用量过高时，自动引导用户通过看广告 / 做任务赚取积分，
-        积分可兑换成 provider token 额度。
-      </p>
-      <ul class="feature-list">
-        <li>✅ 多 Agent 通用 MCP server</li>
-        <li>✅ ZCode 每次对话自动检查余额</li>
-        <li>✅ 接入 Lootably / AdGate / AdGem</li>
-        <li>✅ 本地 SQLite 积分系统</li>
-        <li>✅ snooze 暂停提醒</li>
-      </ul>
-    </section>
+    <section class="card carousel" id="carousel">
+      <div class="carousel-track" id="carousel-track">
+        <div class="slide">
+          <h2>项目介绍</h2>
+          <p>
+            FreeToken 是一个面向 ZCode、Claude Code、Codex、Cursor 等 AI Agent 的广告变现平台。
+            当 Agent 检测到模型 provider 余额不足或 token 用量过高时，自动引导用户通过看广告 / 做任务赚取积分，
+            积分可兑换成 provider token 额度。
+          </p>
+          <ul class="feature-list">
+            <li>✅ 多 Agent 通用 MCP server</li>
+            <li>✅ ZCode 每次对话自动检查余额</li>
+            <li>✅ 接入 Lootably / AdGate / AdGem</li>
+            <li>✅ 本地 SQLite 积分系统</li>
+            <li>✅ snooze 暂停提醒</li>
+          </ul>
+        </div>
 
-    <section class="card">
-      <h2>安装 MCP Server</h2>
-      <h3 style="color: var(--text-dim); margin: 20px 0 10px; font-size: 1.1rem;">方式一：远程一键安装（推荐）</h3>
-      <p>不需要先下载代码，一条命令自动完成下载、安装依赖、配置 Agent：</p>
-      <div class="code-block">
-        <button class="copy-btn" onclick="copyCode(this)">复制</button>
-        <pre id="install-cmd">node -e &quot;$(curl -fsSL https://raw.githubusercontent.com/kreator666/freetoken/main/install.js)&quot;</pre>
-      </div>
-      <p>Windows PowerShell：</p>
-      <div class="code-block">
-        <button class="copy-btn" onclick="copyCode(this)">复制</button>
-        <pre>(Invoke-WebRequest -Uri https://raw.githubusercontent.com/kreator666/freetoken/main/install.js -UseBasicParsing).Content | node -</pre>
-      </div>
+        <div class="slide">
+          <h2>安装 MCP Server · 远程一键安装</h2>
+          <p>不需要先下载代码，一条命令自动完成下载、安装依赖、配置 Agent：</p>
+          <div class="code-block">
+            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+            <pre>node -e &quot;$(curl -fsSL https://raw.githubusercontent.com/kreator666/freetoken/main/install.js)&quot;</pre>
+          </div>
+          <p>Windows PowerShell：</p>
+          <div class="code-block">
+            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+            <pre>(Invoke-WebRequest -Uri https://raw.githubusercontent.com/kreator666/freetoken/main/install.js -UseBasicParsing).Content | node -</pre>
+          </div>
+        </div>
 
-      <h3 style="color: var(--text-dim); margin: 40px 0 10px; font-size: 1.1rem;">方式二：已有代码配置</h3>
-      <p>如果已经下载了 freetoken 代码，在项目目录内运行：</p>
-      <div class="code-block">
-        <button class="copy-btn" onclick="copyCode(this)">复制</button>
-        <pre>pnpm setup
+        <div class="slide">
+          <h2>安装 MCP Server · 已有代码配置</h2>
+          <p>如果已经下载了 freetoken 代码，在项目目录内运行：</p>
+          <div class="code-block">
+            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+            <pre>pnpm setup
 # 或
 node bin/freetoken.cjs setup</pre>
+          </div>
+          <p>安装完成后，暴露的 tools： <code>check_balance</code>、<code>get_earn_token_prompt</code>、<code>get_user_points</code>、<code>request_redeem</code>、<code>snooze_reminder</code>、<code>is_snoozed</code>、<code>open_offerwall</code>。</p>
+        </div>
       </div>
-
-      <p style="margin-top: 24px;">安装完成后，暴露的 tools： <code>check_balance</code>、<code>get_earn_token_prompt</code>、<code>get_user_points</code>、<code>request_redeem</code>、<code>snooze_reminder</code>、<code>is_snoozed</code>、<code>open_offerwall</code>。</p>
+      <button class="carousel-btn prev" id="carousel-prev" aria-label="上一张">‹</button>
+      <button class="carousel-btn next" id="carousel-next" aria-label="下一张">›</button>
+      <div class="carousel-dots" id="carousel-dots"></div>
     </section>
+
+    <section class="discovery" id="discovery"></section>
 
     <section class="ad-card">
       <span class="ad-label">赞助</span>
@@ -558,15 +801,6 @@ node bin/freetoken.cjs setup</pre>
              data-ad-format="auto"
              data-full-width-responsive="true"
              data-ad-client="ca-pub-9182114044842801"></ins>
-      </div>
-    </section>
-
-    <section class="card enter-section">
-      <h2>进入任务墙</h2>
-      <p>输入你的用户 ID，开始看广告赚积分。</p>
-      <div class="input-group">
-        <input id="user" type="text" placeholder="输入用户 ID，例如 user-123">
-        <button onclick="enter()">进入 <span class="blink">_</span></button>
       </div>
     </section>
 
@@ -634,6 +868,95 @@ node bin/freetoken.cjs setup</pre>
         }, 1500);
       });
     }
+
+    // ---- 轮播 ----
+    const track = document.getElementById('carousel-track');
+    const slides = track.children.length;
+    const dotsBox = document.getElementById('carousel-dots');
+    let slideIndex = 0;
+    let carouselTimer = null;
+
+    for (let i = 0; i < slides; i++) {
+      const dot = document.createElement('button');
+      dot.className = 'dot';
+      dot.setAttribute('aria-label', '第 ' + (i + 1) + ' 张');
+      dot.addEventListener('click', () => { goSlide(i); resetCarouselTimer(); });
+      dotsBox.appendChild(dot);
+    }
+
+    function goSlide(i) {
+      slideIndex = (i + slides) % slides;
+      track.style.transform = 'translateX(-' + slideIndex * 100 + '%)';
+      dotsBox.querySelectorAll('.dot').forEach((d, j) => {
+        d.classList.toggle('active', j === slideIndex);
+      });
+    }
+
+    function resetCarouselTimer() {
+      clearInterval(carouselTimer);
+      carouselTimer = setInterval(() => goSlide(slideIndex + 1), 6000);
+    }
+
+    document.getElementById('carousel-prev').addEventListener('click', () => { goSlide(slideIndex - 1); resetCarouselTimer(); });
+    document.getElementById('carousel-next').addEventListener('click', () => { goSlide(slideIndex + 1); resetCarouselTimer(); });
+
+    const carouselEl = document.getElementById('carousel');
+    carouselEl.addEventListener('mouseenter', () => clearInterval(carouselTimer));
+    carouselEl.addEventListener('mouseleave', resetCarouselTimer);
+
+    goSlide(0);
+    resetCarouselTimer();
+
+    // ---- 随机发现卡片 ----
+    const DISCOVERIES = [
+      { type: 'photo', seed: 'freetoken-peak', badge: '每日一景', title: '山脊之上', desc: '云海翻过山脊，光落在最远的那座峰上。' },
+      { type: 'photo', seed: 'freetoken-lake', badge: '每日一景', title: '静谧湖面', desc: '湖水把时间调成慢速，倒影里藏着另一片天空。' },
+      { type: 'photo', seed: 'freetoken-forest', badge: '每日一景', title: '林间光束', desc: '阳光穿过树冠，尘埃在光柱里缓缓起舞。' },
+      { type: 'photo', seed: 'freetoken-coast', badge: '每日一景', title: '海岸黄昏', desc: '潮水退去，晚霞在沙滩上留下一层金色的箔。' },
+      { type: 'photo', seed: 'freetoken-dune', badge: '每日一景', title: '大漠弧线', desc: '沙丘的曲线，是风用一整夜写下的长诗。' },
+      { type: 'photo', seed: 'freetoken-valley', badge: '每日一景', title: '山谷清晨', desc: '雾气还没散，鸟叫已经先醒了。' },
+      { type: 'ai', icon: '🎟️', badge: 'AI 小讲堂', title: '什么是 Token？', desc: 'Token 是大语言模型处理文本的最小单位：中文大致一字一个，英文约 4 个字符一个。你看到的每一次对话、每一行生成的代码，背后都是 Token 在流动——它也是计费的基本单位，省 Token 就是省钱。' },
+      { type: 'ai', icon: '🔌', badge: 'AI 小讲堂', title: '什么是 MCP？', desc: 'Model Context Protocol（模型上下文协议）是一套开放标准，让 AI Agent 用统一的方式调用外部工具与数据源。FreeToken 的查余额、赚积分、兑换额度等能力，就是通过 MCP 暴露给你的 Agent 的。' },
+      { type: 'ai', icon: '🤖', badge: 'AI 小讲堂', title: '什么是 AI Agent？', desc: 'Agent 不只是聊天：它能理解目标、拆解任务、调用工具并迭代执行，直到把事做完。Claude Code、Cursor 这类编程 Agent，本质上就是"长出了手脚的大模型"。' },
+      { type: 'ai', icon: '🪟', badge: 'AI 小讲堂', title: '上下文窗口', desc: '大模型一次能"看到"的内容长度叫上下文窗口。窗口越大，能同时理解的代码与文档越多；但窗口里的每一个 Token 都计入消耗，所以高效整理上下文是 Agent 省钱的关键。' },
+      { type: 'ai', icon: '📚', badge: 'AI 小讲堂', title: 'RAG 检索增强生成', desc: 'RAG 让模型先检索资料再作答，而不是仅凭训练时的记忆。企业知识库问答、文档助手的背后几乎都是它——先找到对的材料，再让模型把话讲好。' },
+      { type: 'ai', icon: '✍️', badge: 'AI 小讲堂', title: '提示词工程', desc: '同一个模型，不同的提示词效果天差地别。清晰的角色设定、明确的约束条件和少量示例，是撬动大模型能力最便宜的杠杆。' }
+    ];
+
+    const discoveryEl = document.getElementById('discovery');
+    let lastDiscovery = -1;
+
+    function renderDiscovery() {
+      let i;
+      do {
+        i = Math.floor(Math.random() * DISCOVERIES.length);
+      } while (DISCOVERIES.length > 1 && i === lastDiscovery);
+      lastDiscovery = i;
+      const item = DISCOVERIES[i];
+
+      if (item.type === 'photo') {
+        discoveryEl.innerHTML =
+          '<span class="badge">' + item.badge + '</span>' +
+          '<button class="discovery-refresh" title="换一篇" aria-label="换一篇">⟳</button>' +
+          '<div class="discovery-photo">' +
+            '<img src="https://picsum.photos/seed/' + item.seed + '/960/420" alt="' + item.title + '" loading="lazy">' +
+            '<div class="photo-caption"><h3>' + item.title + '</h3><p>' + item.desc + '</p></div>' +
+          '</div>';
+      } else {
+        discoveryEl.innerHTML =
+          '<span class="badge">' + item.badge + '</span>' +
+          '<button class="discovery-refresh" title="换一篇" aria-label="换一篇">⟳</button>' +
+          '<div class="discovery-ai">' +
+            '<div class="ai-icon">' + item.icon + '</div>' +
+            '<h3>' + item.title + '</h3>' +
+            '<p>' + item.desc + '</p>' +
+          '</div>';
+      }
+
+      discoveryEl.querySelector('.discovery-refresh').addEventListener('click', renderDiscovery);
+    }
+
+    renderDiscovery();
 
     // ---- 主题系统 ----
     const THEMES = {
