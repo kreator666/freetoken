@@ -7,6 +7,7 @@ import { PORT, HOST, LOOTABLY_OFFERWALL_URL, ADGATE_WALL_URL, ADGEM_WALL_URL } f
 import apiRouter from './routes/api.js'
 import postbackRouter from './routes/postback.js'
 import { buildEarnTokenPrompt, buildAlwaysPrompt } from './prompts.js'
+import { startPhotoRefresher } from './photos.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -115,6 +116,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 async function main() {
   initDb()
+  startPhotoRefresher()
   app.listen(PORT, HOST, () => {
     console.log(`[ads-platform] server running at http://${HOST}:${PORT}`)
     console.log(`[ads-platform] postback endpoint: http://${HOST}:${PORT}/postback/:provider`)

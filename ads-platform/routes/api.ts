@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { getPoints, spendPoints, getRedeems, setSnooze, isSnoozed } from '../db.js'
+import { getPoints, spendPoints, getRedeems, setSnooze, isSnoozed, getRandomPhoto } from '../db.js'
 
 const router = Router()
 
@@ -70,6 +70,15 @@ router.get('/snooze-check', (req, res) => {
   }
   const snoozed = isSnoozed(userId, provider)
   res.json({ userId, provider, snoozed })
+})
+
+router.get('/photos/random', (_req, res) => {
+  const photo = getRandomPhoto()
+  if (!photo) {
+    res.status(404).json({ error: 'no photos' })
+    return
+  }
+  res.json({ photo })
 })
 
 export default router

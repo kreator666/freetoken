@@ -908,51 +908,88 @@ node bin/freetoken.cjs setup</pre>
     resetCarouselTimer();
 
     // ---- 随机发现卡片 ----
-    const DISCOVERIES = [
-      { type: 'photo', seed: 'freetoken-peak', badge: '每日一景', title: '山脊之上', desc: '云海翻过山脊，光落在最远的那座峰上。' },
-      { type: 'photo', seed: 'freetoken-lake', badge: '每日一景', title: '静谧湖面', desc: '湖水把时间调成慢速，倒影里藏着另一片天空。' },
-      { type: 'photo', seed: 'freetoken-forest', badge: '每日一景', title: '林间光束', desc: '阳光穿过树冠，尘埃在光柱里缓缓起舞。' },
-      { type: 'photo', seed: 'freetoken-coast', badge: '每日一景', title: '海岸黄昏', desc: '潮水退去，晚霞在沙滩上留下一层金色的箔。' },
-      { type: 'photo', seed: 'freetoken-dune', badge: '每日一景', title: '大漠弧线', desc: '沙丘的曲线，是风用一整夜写下的长诗。' },
-      { type: 'photo', seed: 'freetoken-valley', badge: '每日一景', title: '山谷清晨', desc: '雾气还没散，鸟叫已经先醒了。' },
-      { type: 'ai', icon: '🎟️', badge: 'AI 小讲堂', title: '什么是 Token？', desc: 'Token 是大语言模型处理文本的最小单位：中文大致一字一个，英文约 4 个字符一个。你看到的每一次对话、每一行生成的代码，背后都是 Token 在流动——它也是计费的基本单位，省 Token 就是省钱。' },
-      { type: 'ai', icon: '🔌', badge: 'AI 小讲堂', title: '什么是 MCP？', desc: 'Model Context Protocol（模型上下文协议）是一套开放标准，让 AI Agent 用统一的方式调用外部工具与数据源。FreeToken 的查余额、赚积分、兑换额度等能力，就是通过 MCP 暴露给你的 Agent 的。' },
-      { type: 'ai', icon: '🤖', badge: 'AI 小讲堂', title: '什么是 AI Agent？', desc: 'Agent 不只是聊天：它能理解目标、拆解任务、调用工具并迭代执行，直到把事做完。Claude Code、Cursor 这类编程 Agent，本质上就是"长出了手脚的大模型"。' },
-      { type: 'ai', icon: '🪟', badge: 'AI 小讲堂', title: '上下文窗口', desc: '大模型一次能"看到"的内容长度叫上下文窗口。窗口越大，能同时理解的代码与文档越多；但窗口里的每一个 Token 都计入消耗，所以高效整理上下文是 Agent 省钱的关键。' },
-      { type: 'ai', icon: '📚', badge: 'AI 小讲堂', title: 'RAG 检索增强生成', desc: 'RAG 让模型先检索资料再作答，而不是仅凭训练时的记忆。企业知识库问答、文档助手的背后几乎都是它——先找到对的材料，再让模型把话讲好。' },
-      { type: 'ai', icon: '✍️', badge: 'AI 小讲堂', title: '提示词工程', desc: '同一个模型，不同的提示词效果天差地别。清晰的角色设定、明确的约束条件和少量示例，是撬动大模型能力最便宜的杠杆。' }
+    const AI_SNIPPETS = [
+      { icon: '🎟️', title: '什么是 Token？', desc: 'Token 是大语言模型处理文本的最小单位：中文大致一字一个，英文约 4 个字符一个。你看到的每一次对话、每一行生成的代码，背后都是 Token 在流动——它也是计费的基本单位，省 Token 就是省钱。' },
+      { icon: '🔌', title: '什么是 MCP？', desc: 'Model Context Protocol（模型上下文协议）是一套开放标准，让 AI Agent 用统一的方式调用外部工具与数据源。FreeToken 的查余额、赚积分、兑换额度等能力，就是通过 MCP 暴露给你的 Agent 的。' },
+      { icon: '🤖', title: '什么是 AI Agent？', desc: 'Agent 不只是聊天：它能理解目标、拆解任务、调用工具并迭代执行，直到把事做完。Claude Code、Cursor 这类编程 Agent，本质上就是"长出了手脚的大模型"。' },
+      { icon: '🪟', title: '上下文窗口', desc: '大模型一次能"看到"的内容长度叫上下文窗口。窗口越大，能同时理解的代码与文档越多；但窗口里的每一个 Token 都计入消耗，所以高效整理上下文是 Agent 省钱的关键。' },
+      { icon: '📚', title: 'RAG 检索增强生成', desc: 'RAG 让模型先检索资料再作答，而不是仅凭训练时的记忆。企业知识库问答、文档助手的背后几乎都是它——先找到对的材料，再让模型把话讲好。' },
+      { icon: '✍️', title: '提示词工程', desc: '同一个模型，不同的提示词效果天差地别。清晰的角色设定、明确的约束条件和少量示例，是撬动大模型能力最便宜的杠杆。' }
+    ];
+
+    // 服务端图库不可用时的兜底
+    const FALLBACK_PHOTOS = [
+      { url: 'https://picsum.photos/seed/freetoken-peak/960/420', title: '山脊之上', desc: '云海翻过山脊，光落在最远的那座峰上。' },
+      { url: 'https://picsum.photos/seed/freetoken-lake/960/420', title: '静谧湖面', desc: '湖水把时间调成慢速，倒影里藏着另一片天空。' },
+      { url: 'https://picsum.photos/seed/freetoken-forest/960/420', title: '林间光束', desc: '阳光穿过树冠，尘埃在光柱里缓缓起舞。' },
+      { url: 'https://picsum.photos/seed/freetoken-coast/960/420', title: '海岸黄昏', desc: '潮水退去，晚霞在沙滩上留下一层金色的箔。' }
     ];
 
     const discoveryEl = document.getElementById('discovery');
-    let lastDiscovery = -1;
+    let lastAi = -1;
 
-    function renderDiscovery() {
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    async function fetchDbPhoto() {
+      const res = await fetch('/api/photos/random');
+      if (!res.ok) throw new Error('no photo');
+      const { photo } = await res.json();
+      if (!photo || !(photo.thumbnail || photo.url)) throw new Error('bad photo');
+      return {
+        url: photo.thumbnail || photo.url,
+        title: photo.title || '世界一隅',
+        desc: (photo.creator ? '© ' + photo.creator + ' · ' : '') + 'via ' + photo.source
+      };
+    }
+
+    function pickFallbackPhoto() {
+      return FALLBACK_PHOTOS[Math.floor(Math.random() * FALLBACK_PHOTOS.length)];
+    }
+
+    function pickAiSnippet() {
       let i;
       do {
-        i = Math.floor(Math.random() * DISCOVERIES.length);
-      } while (DISCOVERIES.length > 1 && i === lastDiscovery);
-      lastDiscovery = i;
-      const item = DISCOVERIES[i];
+        i = Math.floor(Math.random() * AI_SNIPPETS.length);
+      } while (AI_SNIPPETS.length > 1 && i === lastAi);
+      lastAi = i;
+      return AI_SNIPPETS[i];
+    }
 
-      if (item.type === 'photo') {
-        discoveryEl.innerHTML =
-          '<span class="badge">' + item.badge + '</span>' +
-          '<button class="discovery-refresh" title="换一篇" aria-label="换一篇">⟳</button>' +
-          '<div class="discovery-photo">' +
-            '<img src="https://picsum.photos/seed/' + item.seed + '/960/420" alt="' + item.title + '" loading="lazy">' +
-            '<div class="photo-caption"><h3>' + item.title + '</h3><p>' + item.desc + '</p></div>' +
-          '</div>';
+    function renderPhotoCard(p) {
+      discoveryEl.innerHTML =
+        '<span class="badge">每日一景</span>' +
+        '<button class="discovery-refresh" title="换一篇" aria-label="换一篇">⟳</button>' +
+        '<div class="discovery-photo">' +
+          '<img src="' + escapeHtml(p.url) + '" alt="' + escapeHtml(p.title) + '" loading="lazy">' +
+          '<div class="photo-caption"><h3>' + escapeHtml(p.title) + '</h3><p>' + escapeHtml(p.desc) + '</p></div>' +
+        '</div>';
+    }
+
+    function renderAiCard(item) {
+      discoveryEl.innerHTML =
+        '<span class="badge">AI 小讲堂</span>' +
+        '<button class="discovery-refresh" title="换一篇" aria-label="换一篇">⟳</button>' +
+        '<div class="discovery-ai">' +
+          '<div class="ai-icon">' + item.icon + '</div>' +
+          '<h3>' + item.title + '</h3>' +
+          '<p>' + item.desc + '</p>' +
+        '</div>';
+    }
+
+    async function renderDiscovery() {
+      if (Math.random() < 0.5) {
+        let photo;
+        try {
+          photo = await fetchDbPhoto();
+        } catch (e) {
+          photo = pickFallbackPhoto();
+        }
+        renderPhotoCard(photo);
       } else {
-        discoveryEl.innerHTML =
-          '<span class="badge">' + item.badge + '</span>' +
-          '<button class="discovery-refresh" title="换一篇" aria-label="换一篇">⟳</button>' +
-          '<div class="discovery-ai">' +
-            '<div class="ai-icon">' + item.icon + '</div>' +
-            '<h3>' + item.title + '</h3>' +
-            '<p>' + item.desc + '</p>' +
-          '</div>';
+        renderAiCard(pickAiSnippet());
       }
-
       discoveryEl.querySelector('.discovery-refresh').addEventListener('click', renderDiscovery);
     }
 

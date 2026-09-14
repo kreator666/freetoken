@@ -47,6 +47,19 @@ export function initDb() {
       UNIQUE(user_id, provider)
     );
 
+    CREATE TABLE IF NOT EXISTS photos (
+      id TEXT PRIMARY KEY,
+      title TEXT,
+      creator TEXT,
+      license TEXT,
+      url TEXT NOT NULL,
+      thumbnail TEXT,
+      width INTEGER,
+      height INTEGER,
+      source TEXT DEFAULT 'openverse',
+      fetched_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE INDEX IF NOT EXISTS idx_transactions_user ON transactions(user_id);
     CREATE INDEX IF NOT EXISTS idx_redeems_user ON redeems(user_id);
   `)
@@ -164,4 +177,52 @@ export function isSnoozed(userId: string, provider: string): boolean {
     | { until: number }
     | undefined
   return !!row && Date.now() < row.until
+}
+
+export interface PhotoRow {
+  id: string
+  title: string | null
+  creator: string | null
+  license: string | null
+  url: string
+  thumbnail: string | null
+  width: number | null
+  height: number | null
+  source: string
+}
+
+export function upsertPhotos(photos: PhotoRow[]): number {
+  const db = ensureDb()
+  const stmt = db.prepare(
+    `INSERT INTO photos (id, title, creator, license, url, thumbnail, width, height, source)
+     VALUES (@id, @title, @creator, @license, @url, @thumbnail, @width, @height, @source)
+     ON CONFLICT(id) DO UPDATE SET
+       title = excluded.title,
+       creator = excluded.creator,
+       license = excluded.license,
+       url = excluded.url,
+       thumbnail = excluded.thumbnail,
+       width = excluded.width,
+       height = excluded.height,
+       fetched_at = CURRENT_TIMESTAMP`
+  )
+  const runAll = db.transaction((rows: PhotoRow[]) => {
+    for (const row of rows) stmt.run(row)
+  })
+  runAll(photos)
+  return photos.length
+}
+
+export function getRandomPhoto(): PhotoRow | null {
+  const db = ensureDb()
+  const row = db
+    .prepare('SELECT id, title, creator, license, url, thumbnail, width, height, source FROM photos ORDER BY RANDOM() LIMIT 1')
+    .get() as PhotoRow | undefined
+  return row ?? null
+}
+
+export function countPhotos(): number {
+  const db = ensureDb()
+  const row = db.prepare('SELECT COUNT(*) AS n FROM photos').get() as { n: number }
+  return row.n
 }
