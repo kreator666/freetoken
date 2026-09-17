@@ -12,11 +12,14 @@ import {
   findProjectRoot,
   mergeConfig,
 } from './utils.js'
+import { detectAgents } from './detect.js'
 
 interface SetupOptions {
   projectRoot: string
   agents: string[]
 }
+
+type SetupStatus = 'configured' | 'skipped'
 
 function getNodeCommand(projectRoot: string): { command: string; args: string[] } {
   return {
@@ -102,7 +105,7 @@ async function ensurePromptMode(projectRoot: string) {
   }
 }
 
-function setupZCode(projectRoot: string) {
+function setupZCode(projectRoot: string): SetupStatus {
   console.log('\n🛠️  配置 ZCode...')
 
   const hooksDir = path.join(HOME, '.zcode', 'hooks')
@@ -163,54 +166,89 @@ function setupZCode(projectRoot: string) {
   }
   writeJson(cliConfigPath, mergeConfig(existing, updates))
   console.log('✅ 已写入 ZCode MCP 和 hook 配置')
+  return 'configured'
 }
 
-function setupClaude(projectRoot: string) {
-  const claudeDir = path.join(HOME, '.claude')
-  if (!dirExists(claudeDir)) return
+function setupClaude(projectRoot: string): SetupStatus {
   console.log('\n🛠️  配置 Claude Code...')
+  const claudeDir = path.join(HOME, '.claude')
 
+  // 规则文件：已存在则跳过，避免覆盖个人配置
   const agentsPath = path.join(claudeDir, 'AGENTS.md')
+  let status: SetupStatus = 'configured'
   if (fileExists(agentsPath)) {
     console.log('⚠️  ~/.claude/AGENTS.md 已存在，跳过（避免覆盖个人配置）')
-    return
+    status = 'skipped'
+  } else {
+    copyFile(path.join(projectRoot, '.claude/AGENTS.md'), agentsPath)
+    console.log('✅ 已写入 ~/.claude/AGENTS.md')
   }
-  copyFile(path.join(projectRoot, '.claude/AGENTS.md'), agentsPath)
-  console.log('✅ 已写入 ~/.claude/AGENTS.md')
+
+  // MCP server：merge 写入 ~/.claude.json，不影响其他键
+  const { command, args } = getNodeCommand(projectRoot)
+  const claudeJsonPath = path.join(HOME, '.claude.json')
+  const existing = (readJson(claudeJsonPath) || {}) as Record<string, unknown>
+  writeJson(
+    claudeJsonPath,
+    mergeConfig(existing, {
+      mcpServers: {
+        freetoken: { command, args, cwd: projectRoot },
+      },
+    })
+  )
+  console.log('✅ 已写入 ~/.claude.json 的 mcpServers.freetoken')
+  return status
 }
 
-function setupCodex(projectRoot: string) {
-  const codexDir = path.join(HOME, '.codex')
-  if (!dirExists(codexDir)) return
+function setupCodex(projectRoot: string): SetupStatus {
   console.log('\n🛠️  配置 Codex...')
+  const codexDir = path.join(HOME, '.codex')
 
   const instructionsPath = path.join(codexDir, 'instructions.md')
   if (fileExists(instructionsPath)) {
     console.log('⚠️  ~/.codex/instructions.md 已存在，跳过')
-    return
+    return 'skipped'
   }
   copyFile(path.join(projectRoot, '.codex/instructions.md'), instructionsPath)
   console.log('✅ 已写入 ~/.codex/instructions.md')
+  return 'configured'
 }
 
-function setupCursor(projectRoot: string) {
+function setupCursor(projectRoot: string): SetupStatus {
+  console.log('\n🛠️  配置 Cursor...')
+  let status: SetupStatus = 'configured'
+
+  // .cursorrules 规则文件：已存在则跳过
   const cursorRules = path.join(HOME, '.cursorrules')
   if (fileExists(cursorRules)) {
-    console.log('\n⚠️  ~/.cursorrules 已存在，跳过')
-    return
+    console.log('⚠️  ~/.cursorrules 已存在，跳过')
+    status = 'skipped'
+  } else {
+    copyFile(path.join(projectRoot, '.cursorrules'), cursorRules)
+    console.log('✅ 已写入 ~/.cursorrules')
   }
-  console.log('\n🛠️  配置 Cursor...')
-  copyFile(path.join(projectRoot, '.cursorrules'), cursorRules)
-  console.log('✅ 已写入 ~/.cursorrules')
+
+  // MCP server：merge 写入 ~/.cursor/mcp.json
+  const { command, args } = getNodeCommand(projectRoot)
+  const cursorMcpPath = path.join(HOME, '.cursor', 'mcp.json')
+  const existing = (readJson(cursorMcpPath) || {}) as Record<string, unknown>
+  writeJson(
+    cursorMcpPath,
+    mergeConfig(existing, {
+      mcpServers: {
+        freetoken: { command, args, cwd: projectRoot },
+      },
+    })
+  )
+  console.log('✅ 已写入 ~/.cursor/mcp.json')
+  return status
 }
 
-function setupTrae(projectRoot: string) {
-  const traeDir = path.join(HOME, '.trae')
-  if (!dirExists(traeDir)) return
+function setupTrae(projectRoot: string): SetupStatus {
   console.log('\n🛠️  配置 Trae...')
 
   const { command, args } = getNodeCommand(projectRoot)
-  const configPath = path.join(traeDir, 'mcp_config.json')
+  const configPath = path.join(HOME, '.trae', 'mcp_config.json')
   const existing = (readJson(configPath) || {}) as Record<string, unknown>
   const updates = {
     mcpServers: {
@@ -224,15 +262,14 @@ function setupTrae(projectRoot: string) {
   writeJson(configPath, mergeConfig(existing, updates))
   console.log(`✅ 已写入 ${configPath}`)
   console.log('   如果 Trae 没有自动识别，请在 Trae 设置面板的 MCP / 模型上下文协议中查看')
+  return 'configured'
 }
 
-function setupVSCodeKimi(projectRoot: string) {
-  const vscodeDir = path.join(HOME, '.vscode')
-  if (!dirExists(vscodeDir)) return
+function setupVSCodeKimi(projectRoot: string): SetupStatus {
   console.log('\n🛠️  配置 VSCode + Kimi Code 插件...')
 
   const { command, args } = getNodeCommand(projectRoot)
-  const settingsPath = path.join(vscodeDir, 'settings.json')
+  const settingsPath = path.join(HOME, '.vscode', 'settings.json')
   const existing = (readJson(settingsPath) || {}) as Record<string, unknown>
   // Kimi Code 插件常见的 MCP 配置键名，按优先级尝试写入最可能的键
   const updates = {
@@ -247,6 +284,41 @@ function setupVSCodeKimi(projectRoot: string) {
   writeJson(settingsPath, mergeConfig(existing, updates))
   console.log(`✅ 已写入 ${settingsPath}（kimi.mcpServers）`)
   console.log('   如果 Kimi Code 没有识别，请检查插件设置里 MCP server 的实际键名，并手动调整')
+  return 'configured'
+}
+
+function setupKimiCode(projectRoot: string): SetupStatus {
+  console.log('\n🛠️  配置 Kimi Code CLI...')
+
+  const { command, args } = getNodeCommand(projectRoot)
+  const mcpPath = path.join(HOME, '.kimi-code', 'mcp.json')
+  const existing = (readJson(mcpPath) || {}) as Record<string, unknown>
+  writeJson(
+    mcpPath,
+    mergeConfig(existing, {
+      mcpServers: {
+        freetoken: { command, args, cwd: projectRoot },
+      },
+    })
+  )
+  console.log(`✅ 已写入 ${mcpPath}`)
+  console.log('   重启 Kimi Code 或运行 /reload 后，用 /mcp 查看连接状态')
+  return 'configured'
+}
+
+const AGENT_SETUPS: Record<string, (projectRoot: string) => SetupStatus> = {
+  zcode: setupZCode,
+  claude: setupClaude,
+  codex: setupCodex,
+  cursor: setupCursor,
+  trae: setupTrae,
+  'vscode-kimi': setupVSCodeKimi,
+  'kimi-code': setupKimiCode,
+}
+
+const STATUS_LABEL: Record<SetupStatus, string> = {
+  configured: '✅ 已配置',
+  skipped: '⏭️  已存在，跳过',
 }
 
 function printNextSteps(projectRoot: string) {
@@ -256,7 +328,7 @@ function printNextSteps(projectRoot: string) {
   console.log('1. 编辑 .env 配置广告墙 URL（LOOTABLY_OFFERWALL_URL 等）')
   console.log('2. 启动 HTTP 服务：pnpm dev')
   console.log(`3. 启动 MCP server：${command} ${args.join(' ')}`)
-  console.log('4. 完全退出并重新打开你的 Agent（ZCode / Claude Code / Codex / Cursor / Trae / VSCode+Kimi）')
+  console.log('4. 完全退出并重新打开你的 Agent')
   console.log('5. 在 Agent 中聊天，余额低时会自动出现赚 Token 提示\n')
 }
 
@@ -273,11 +345,36 @@ export async function setup(options: Partial<SetupOptions> = {}) {
   installDeps(projectRoot)
   setupEnv(projectRoot)
   await ensurePromptMode(projectRoot)
-  setupZCode(projectRoot)
-  setupClaude(projectRoot)
-  setupCodex(projectRoot)
-  setupCursor(projectRoot)
-  setupTrae(projectRoot)
-  setupVSCodeKimi(projectRoot)
+
+  // 探测本机已安装的 Agent，只为检测到的 Agent 写入配置
+  const agents = detectAgents()
+  const detected = agents.filter((a) => a.detected)
+  const missed = agents.filter((a) => !a.detected)
+
+  console.log('\n🔍 Agent 探测结果：')
+  for (const agent of detected) {
+    console.log(`   ✅ ${agent.name}（${agent.signals.join('、')}）`)
+  }
+  for (const agent of missed) {
+    console.log(`   ❌ 未检测到 ${agent.name}，跳过`)
+  }
+
+  const results: Array<{ name: string; status: SetupStatus | 'not-detected' }> = []
+  for (const agent of agents) {
+    const setupFn = AGENT_SETUPS[agent.id]
+    if (!setupFn) continue
+    if (!agent.detected) {
+      results.push({ name: agent.name, status: 'not-detected' })
+      continue
+    }
+    results.push({ name: agent.name, status: setupFn(projectRoot) })
+  }
+
+  console.log('\n📋 配置汇总：')
+  for (const r of results) {
+    const label = r.status === 'not-detected' ? '❌ 未检测到' : STATUS_LABEL[r.status]
+    console.log(`   ${label}  ${r.name}`)
+  }
+
   printNextSteps(projectRoot)
 }

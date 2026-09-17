@@ -123,12 +123,15 @@ FreeToken 提供 stdio MCP server，所有支持 MCP 的 Agent 都能复用：
 |---|---|---|
 | **ZCode** | `UserPromptSubmit` hook + MCP `/api/prompt` | ✅ 是 |
 | **Trae** | MCP + 项目 instructions | ⚠️ 依赖模型自律 |
-| **VSCode + Kimi Code** | MCP + 项目 instructions | ⚠️ 依赖模型自律 |
-| **Claude Code** | AGENTS.md / project instructions | ⚠️ 依赖模型自律 |
+| **VSCode + Kimi Code 插件** | MCP + 项目 instructions | ⚠️ 依赖模型自律 |
+| **Kimi Code CLI** | MCP（`~/.kimi-code/mcp.json`）+ 项目 instructions | ⚠️ 依赖模型自律 |
+| **Claude Code** | MCP（`~/.claude.json`）+ AGENTS.md | ⚠️ 依赖模型自律 |
 | **Codex** | instructions.md | ⚠️ 依赖模型自律 |
-| **Cursor** | .cursorrules | ⚠️ 依赖模型自律 |
+| **Cursor** | MCP（`~/.cursor/mcp.json`）+ .cursorrules | ⚠️ 依赖模型自律 |
 
 > 注意：MCP server 本身是被动的，必须由 Agent 调用。目前只有 ZCode 的 hook 机制能真正做到"每次对话前强制检查余额并插入提示"。其他 Agent 需要依靠 MCP tools + instructions 引导模型主动调用 tools。
+
+一键安装（`install.js` / `pnpm setup` / `freetoken setup`）会**自动探测**本机安装了哪些 Agent（检查 PATH 中的可执行文件和 `~/.zcode`、`~/.claude`、`~/.codex`、`~/.cursor`、`~/.trae`、`~/.vscode`、`~/.kimi-code` 等配置目录），只为检测到的 Agent 写入对应配置，并在结束时输出配置汇总。
 
 ### ZCode 快速配置
 
@@ -185,6 +188,28 @@ Kimi Code 插件通过 VSCode 的 `settings.json` 配置 MCP server。一键安�
 > 注意：Kimi Code 插件不同版本的 MCP 配置键名可能不同（如 `kimi.code.mcpServers`、`kimi.mcpServers` 等）。如果上述键名不生效，请查看 Kimi Code 插件的官方文档或设置面板，找到对应的 MCP server 入口，手动复制以上 `command/args/cwd`。
 
 配置完成后，完全重启 VSCode。
+
+### Kimi Code CLI 快速配置
+
+Kimi Code CLI 的 MCP 配置写在用户级 `~/.kimi-code/mcp.json`（也可用 `/mcp-config` 命令交互配置）。一键安装脚本会自动探测并写入：
+
+```json
+{
+  "mcpServers": {
+    "freetoken": {
+      "command": "node",
+      "args": [
+        "--import",
+        "tsx",
+        "/path/to/freetoken/ads-platform/mcp/server.ts"
+      ],
+      "cwd": "/path/to/freetoken"
+    }
+  }
+}
+```
+
+配置完成后，重启 Kimi Code 或在 TUI 中运行 `/reload`，然后用 `/mcp` 查看连接状态。
 
 ### 其他 Agent
 
