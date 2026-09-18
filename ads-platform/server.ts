@@ -8,6 +8,7 @@ import apiRouter from './routes/api.js'
 import postbackRouter from './routes/postback.js'
 import { buildEarnTokenPrompt, buildAlwaysPrompt } from './prompts.js'
 import { startPhotoRefresher } from './photos.js'
+import { getVisits, incrementVisits } from './visits.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -24,6 +25,15 @@ app.get('/api/config', (_req, res) => {
     adgateWallUrl: ADGATE_WALL_URL,
     adgemWallUrl: ADGEM_WALL_URL,
   })
+})
+
+// 网站访问计数：GET 只读当前值，POST 累计 +1
+app.get('/api/visits', (_req, res) => {
+  res.json({ count: getVisits() })
+})
+
+app.post('/api/visits', (_req, res) => {
+  res.json({ count: incrementVisits() })
 })
 
 // 生成标准化的「赚 Token」提示文本，供 Agent 插入到回复中

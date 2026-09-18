@@ -220,6 +220,14 @@
       white-space: nowrap;
     }
 
+    .nav-counter {
+      font-family: var(--font-display);
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      white-space: nowrap;
+      text-shadow: 0 0 6px var(--glow);
+    }
+
     .nav-actions {
       display: flex;
       align-items: center;
@@ -727,6 +735,7 @@
   <canvas id="bg-canvas"></canvas>
 
   <nav class="navbar">
+    <span class="nav-counter" id="visit-counter" title="本站累计访问次数">访问 …</span>
     <a class="nav-logo" href="/">FreeToken<span class="blink">_</span></a>
     <div class="nav-actions">
       <div class="nav-login">
@@ -1226,6 +1235,27 @@ node bin/freetoken.cjs setup</pre>
     }
 
     setTheme(currentTheme);
+
+    // ---- 访问计数 ----
+    (async function () {
+      const el = document.getElementById('visit-counter');
+      if (!el) return;
+      const render = (n) => { el.textContent = '访问 ' + Number(n).toLocaleString(); };
+      try {
+        let count;
+        if (!sessionStorage.getItem('freetoken-visited')) {
+          const res = await fetch('/api/visits', { method: 'POST' });
+          count = (await res.json()).count;
+          sessionStorage.setItem('freetoken-visited', '1');
+        } else {
+          const res = await fetch('/api/visits');
+          count = (await res.json()).count;
+        }
+        render(count);
+      } catch (e) {
+        el.textContent = '';
+      }
+    })();
 
     // Google AdSense
     (adsbygoogle = window.adsbygoogle || []).push({});
