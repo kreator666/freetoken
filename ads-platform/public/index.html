@@ -210,6 +210,12 @@
       transition: background 0.4s ease, border-color 0.4s ease;
     }
 
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
     .nav-logo {
       font-family: var(--font-display);
       color: var(--accent);
@@ -702,6 +708,9 @@
       .nav-logo {
         text-align: center;
       }
+      .nav-brand {
+        justify-content: center;
+      }
       .nav-actions {
         justify-content: center;
       }
@@ -735,8 +744,10 @@
   <canvas id="bg-canvas"></canvas>
 
   <nav class="navbar">
-    <span class="nav-counter" id="visit-counter" title="本站累计访问次数">访问 …</span>
-    <a class="nav-logo" href="/">FreeToken<span class="blink">_</span></a>
+    <div class="nav-brand">
+      <a class="nav-logo" href="/">FreeToken<span class="blink">_</span></a>
+      <span class="nav-counter" id="visit-counter" title="本站累计访问次数">访问 …</span>
+    </div>
     <div class="nav-actions">
       <div class="nav-login">
         <input id="user" type="text" placeholder="用户 ID，例如 user-123">
