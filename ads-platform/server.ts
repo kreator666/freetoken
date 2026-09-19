@@ -93,8 +93,6 @@ app.get('/offerwall', (req, res) => {
     .box { border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-top: 20px; background: #fafafa; }
     .empty { color: #888; }
     a { color: #0066cc; }
-    .ad-card { border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-top: 20px; background: #fafafa; text-align: center; }
-    .ad-card .ad-label { float: right; font-size: 0.65rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.08em; }
   </style>
 </head>
 <body>
@@ -102,19 +100,6 @@ app.get('/offerwall', (req, res) => {
   <p>当前用户：<code>${userId}</code> · Provider：<code>${provider || 'default'}</code></p>
   <div class="box">
     <p>完成页面上的任务后积分会自动到账。可在 <a href="/dashboard.html?user=${encodeURIComponent(userId)}">积分面板</a> 查看。</p>
-  </div>
-  <div class="ad-card">
-    <span class="ad-label">广告</span>
-    <script>
-      atOptions = {
-        'key' : '48bd043605e7b5847f0fe98cbc1890b5',
-        'format' : 'iframe',
-        'height' : 250,
-        'width' : 300,
-        'params' : {}
-      };
-    </script>
-    <script src="https://www.highrevenueformat.com/48bd043605e7b5847f0fe98cbc1890b5/invoke.js"></script>
   </div>
 </body>
 </html>`)
