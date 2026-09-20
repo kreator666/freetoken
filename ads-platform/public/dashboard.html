@@ -63,13 +63,23 @@
 
   <script>
     const params = new URLSearchParams(location.search)
-    const userId = params.get('user') || ''
-    document.getElementById('userId').textContent = userId || '未指定'
+    let userId = params.get('user') || ''
 
     function show(text, kind) {
       const el = document.getElementById('message')
       el.textContent = text
       el.className = 'message show ' + kind
+    }
+
+    async function resolveUser() {
+      if (userId) return userId
+      try {
+        const res = await fetch('/api/auth/me')
+        const { user } = await res.json()
+        return user || ''
+      } catch (e) {
+        return ''
+      }
     }
 
     async function load() {
@@ -136,6 +146,12 @@
     })
 
     load()
+
+    resolveUser().then((u) => {
+      userId = u
+      document.getElementById('userId').textContent = userId || '未登录（请先从首页登录）'
+      load()
+    })
   </script>
 </body>
 </html>

@@ -231,6 +231,85 @@
       text-shadow: 0 0 6px var(--glow);
     }
 
+    .nav-hello {
+      font-family: var(--font-display);
+      color: var(--text-soft);
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+
+    .modal-mask {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal {
+      background: var(--panel);
+      border: 1px solid var(--border-dim);
+      border-radius: 12px;
+      padding: 24px;
+      width: 100%;
+      max-width: 340px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .modal-tabs button {
+      flex: 1;
+      background: transparent;
+      border: 1px solid var(--border-dim);
+      color: var(--text-dim);
+      border-radius: 999px;
+      padding: 8px 0;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+
+    .modal-tabs button.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+      font-weight: 600;
+    }
+
+    .modal input {
+      background: var(--input-bg);
+      border: 1px solid var(--border-dim);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .modal input:focus {
+      border-color: var(--accent);
+    }
+
+    .modal-error {
+      color: #ff5555;
+      font-size: 0.8rem;
+      min-height: 1em;
+      margin: 0;
+    }
+
     .nav-actions {
       display: flex;
       align-items: center;
@@ -266,7 +345,8 @@
       box-shadow: 0 0 12px var(--glow-btn);
     }
 
-    .nav-login button {
+    .nav-login button,
+    .modal-submit {
       background: var(--accent);
       color: var(--on-accent);
       border: none;
@@ -281,7 +361,8 @@
       transition: all 0.2s;
     }
 
-    .nav-login button:hover {
+    .nav-login button:hover,
+    .modal-submit:hover {
       background: var(--accent-hover);
       box-shadow: 0 0 18px var(--glow);
     }
@@ -747,12 +828,32 @@
     </div>
     <div class="nav-actions">
       <div class="nav-login">
-        <input id="user" type="text" placeholder="用户 ID，例如 user-123">
-        <button onclick="enter()">进入任务墙</button>
+        <span id="auth-guest">
+          <button onclick="openAuthModal('login')">登录</button>
+          <button onclick="openAuthModal('register')">注册</button>
+        </span>
+        <span id="auth-user" style="display:none">
+          <span class="nav-hello" id="auth-username"></span>
+          <button onclick="location.href='/offerwall'">进入任务墙</button>
+          <button onclick="logout()">退出</button>
+        </span>
       </div>
       <div class="nav-themes" id="theme-switcher" aria-label="切换主题"></div>
     </div>
   </nav>
+
+  <div class="modal-mask" id="auth-modal" style="display:none" onclick="if (event.target === this) closeAuthModal()">
+    <div class="modal">
+      <div class="modal-tabs">
+        <button id="tab-login" class="active" onclick="switchAuthTab('login')">登录</button>
+        <button id="tab-register" onclick="switchAuthTab('register')">注册</button>
+      </div>
+      <input id="auth-name" type="text" placeholder="用户名（3-20 位）" autocomplete="username">
+      <input id="auth-pass" type="password" placeholder="密码（至少 6 位）" autocomplete="current-password">
+      <p class="modal-error" id="auth-error"></p>
+      <button class="modal-submit" id="auth-submit" onclick="submitAuth()">登录</button>
+    </div>
+  </div>
 
   <div class="container">
     <header class="hero">
@@ -851,18 +952,70 @@ node bin/freetoken.cjs setup</pre>
     }
     type();
 
-    function enter() {
-      const user = document.getElementById('user').value.trim();
-      if (!user) {
-        alert('请输入用户 ID');
-        return;
-      }
-      window.location.href = '/offerwall?user=' + encodeURIComponent(user);
+    // ---- 注册 / 登录 ----
+    let authMode = 'login';
+
+    function openAuthModal(mode) {
+      switchAuthTab(mode);
+      document.getElementById('auth-error').textContent = '';
+      document.getElementById('auth-modal').style.display = 'flex';
+      document.getElementById('auth-name').focus();
     }
 
-    document.getElementById('user').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') enter();
+    function closeAuthModal() {
+      document.getElementById('auth-modal').style.display = 'none';
+    }
+
+    function switchAuthTab(mode) {
+      authMode = mode;
+      document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+      document.getElementById('tab-register').classList.toggle('active', mode === 'register');
+      document.getElementById('auth-submit').textContent = mode === 'login' ? '登录' : '注册并登录';
+      document.getElementById('auth-error').textContent = '';
+    }
+
+    async function submitAuth() {
+      const username = document.getElementById('auth-name').value.trim();
+      const password = document.getElementById('auth-pass').value;
+      const errEl = document.getElementById('auth-error');
+      errEl.textContent = '';
+      try {
+        const res = await fetch('/api/auth/' + authMode, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errEl.textContent = data.error || '操作失败，请重试';
+          return;
+        }
+        closeAuthModal();
+        renderAuth(data.user);
+      } catch (e) {
+        errEl.textContent = '网络错误，请重试';
+      }
+    }
+
+    async function logout() {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      renderAuth(null);
+    }
+
+    function renderAuth(user) {
+      document.getElementById('auth-guest').style.display = user ? 'none' : '';
+      document.getElementById('auth-user').style.display = user ? '' : 'none';
+      if (user) document.getElementById('auth-username').textContent = '你好，' + user;
+    }
+
+    document.getElementById('auth-pass').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submitAuth();
     });
+
+    fetch('/api/auth/me')
+      .then((res) => res.json())
+      .then((data) => renderAuth(data.user))
+      .catch(() => {});
 
     function copyCode(btn) {
       const pre = btn.nextElementSibling;

@@ -6,9 +6,11 @@ import { initDb } from './db.js'
 import { PORT, HOST, LOOTABLY_OFFERWALL_URL, ADGATE_WALL_URL, ADGEM_WALL_URL } from './config.js'
 import apiRouter from './routes/api.js'
 import postbackRouter from './routes/postback.js'
+import authRouter from './routes/auth.js'
 import { buildEarnTokenPrompt, buildAlwaysPrompt } from './prompts.js'
 import { startPhotoRefresher } from './photos.js'
 import { getVisits, incrementVisits } from './visits.js'
+import { getSessionUser } from './auth.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -75,9 +77,13 @@ app.get('/api/prompt', (req, res) => {
   res.json({ prompt })
 })
 
-// offerwall 落地页：服务器把用户 ID 注入 HTML，避免把 secret 暴露给客户端
+// offerwall 落地页：优先取 URL 参数，否则回退到登录会话，都没有则回首页登录
 app.get('/offerwall', (req, res) => {
-  const userId = String(req.query.user || '')
+  const userId = String(req.query.user || '') || getSessionUser(req) || ''
+  if (!userId) {
+    res.redirect('/')
+    return
+  }
   const provider = String(req.query.provider || '')
 
   res.send(`<!DOCTYPE html>
@@ -106,6 +112,7 @@ app.get('/offerwall', (req, res) => {
 })
 
 app.use('/api', apiRouter)
+app.use('/api/auth', authRouter)
 app.use('/postback', postbackRouter)
 app.use(express.static(path.join(__dirname, 'public')))
 

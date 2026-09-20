@@ -60,6 +60,19 @@ export function initDb() {
       fetched_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
 
+    CREATE TABLE IF NOT EXISTS accounts (
+      username TEXT PRIMARY KEY,
+      password_hash TEXT NOT NULL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS sessions (
+      token TEXT PRIMARY KEY,
+      username TEXT NOT NULL,
+      expires_at INTEGER NOT NULL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE INDEX IF NOT EXISTS idx_transactions_user ON transactions(user_id);
     CREATE INDEX IF NOT EXISTS idx_redeems_user ON redeems(user_id);
   `)
